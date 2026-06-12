@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Surat KUA Longkib</title>
+<link rel="stylesheet" href="assets/styles.css" />
+</head>
+<body>
+  <div class="app">
+    <header class="hero">
+      <div class="badge">✉️</div>
+      <h1 id="appTitle">Surat KUA Longkib</h1>
+      <p>Pilih jenis surat, isi data, lalu cetak sebagai PDF.</p>
+    </header>
+
+    <form id="suratForm" class="card" novalidate>
+      <div class="section-label">Jenis Surat</div>
+      <div class="picker">
+        <select id="tplSelect" class="tpl"></select>
+      </div>
+      <div class="tpl-desc" id="tplDesc"></div>
+
+      <div class="section-label">Data</div>
+      <div id="fields"><!-- field dibangun otomatis dari template --></div>
+
+      <div class="actions">
+        <button type="submit" class="btn btn-primary">Buat Surat &amp; Cetak PDF</button>
+        <button type="button" id="btnReset" class="btn btn-ghost">Kosongkan Form</button>
+      </div>
+    </form>
+
+    <footer class="note">
+      Surat akan terbuka di tab baru. Pilih <strong>Save as PDF</strong> pada dialog cetak.
+    </footer>
+  </div>
+
+  <script src="assets/util.js"></script>
+  <script src="assets/config.js"></script>
+  <script src="assets/templates.js"></script>
+  <script src="assets/datepicker.js"></script>
+  <script src="assets/app.js"></script>
+</body>
+</html>

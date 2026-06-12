@@ -1,0 +1,11 @@
+# OS
+Thumbs.db
+.DS_Store
+
+# File hasil tes / sementara
+__*.html
+__*.png
+__*.pdf
+contoh-*.pdf
+cek-*.pdf
+hasil-tes.pdf

@@ -1,0 +1,140 @@
+:root {
+  --green: #00693e;
+  --green-dark: #004d2e;
+  --green-soft: #e6f2ec;
+  --ink: #1a1f25;
+  --muted: #6b7682;
+  --line: #dfe5ea;
+  --bg: #f4f6f8;
+  --danger: #c0392b;
+  --radius: 14px;
+  --shadow: 0 6px 24px rgba(0, 0, 0, 0.08);
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+.app { max-width: 640px; margin: 0 auto; padding: 0 16px 48px; }
+
+header.hero { text-align: center; padding: 28px 16px 22px; }
+header.hero .badge {
+  width: 56px; height: 56px; border-radius: 16px;
+  background: var(--green); color: #fff;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 26px; margin-bottom: 12px; box-shadow: var(--shadow);
+}
+header.hero h1 { font-size: 20px; margin: 0 0 4px; letter-spacing: -0.01em; }
+header.hero p { margin: 0; color: var(--muted); font-size: 14px; }
+
+.card {
+  background: #fff; border: 1px solid var(--line);
+  border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px;
+}
+
+.section-label {
+  font-size: 12px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.06em; color: var(--muted); margin: 4px 0 10px;
+}
+
+/* Pemilih template */
+.picker { margin-bottom: 6px; }
+select.tpl {
+  width: 100%; border: 1.5px solid var(--line); border-radius: 10px;
+  padding: 12px 14px; font-size: 16px; font-family: inherit;
+  background: #fff; color: var(--ink); appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236b7682' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 14px center;
+}
+select.tpl:focus { outline: none; border-color: var(--green); box-shadow: 0 0 0 3px var(--green-soft); }
+.tpl-desc { font-size: 13px; color: var(--muted); margin: 8px 2px 22px; min-height: 18px; }
+
+.field { margin-bottom: 16px; }
+.field label.flabel { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+.field label.flabel .req { color: var(--danger); }
+
+.input, textarea {
+  width: 100%; border: 1.5px solid var(--line); border-radius: 10px;
+  padding: 12px 14px; font-size: 16px; font-family: inherit; color: var(--ink);
+  background: #fff; transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.input:focus, textarea:focus { outline: none; border-color: var(--green); box-shadow: 0 0 0 3px var(--green-soft); }
+textarea { resize: vertical; min-height: 72px; }
+
+select.input {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236b7682' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 14px center; padding-right: 40px;
+}
+
+/* Datepicker custom */
+.dp { position: relative; }
+.dp-display { cursor: pointer; padding-right: 40px; background: #fff; }
+.dp-icon {
+  position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+  pointer-events: none; font-size: 16px; opacity: 0.75;
+}
+.dp-pop {
+  position: absolute; z-index: 50; top: calc(100% + 6px); left: 0;
+  width: 300px; max-width: calc(100vw - 32px);
+  background: #fff; border: 1px solid var(--line); border-radius: 12px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.16); padding: 12px;
+}
+.dp-head { display: flex; align-items: center; gap: 6px; margin-bottom: 8px; }
+.dp-nav {
+  flex: 0 0 auto; width: 32px; height: 32px; border: none; cursor: pointer;
+  border-radius: 8px; background: var(--green-soft); color: var(--green-dark);
+  font-size: 18px; line-height: 1;
+}
+.dp-nav:hover { background: #d6e9df; }
+.dp-sel { flex: 1 1 auto; display: flex; gap: 6px; }
+.dp-sel select {
+  flex: 1; border: 1.5px solid var(--line); border-radius: 8px;
+  padding: 6px 8px; font-size: 14px; font-family: inherit; background: #fff; color: var(--ink);
+}
+.dp-sel select:focus { outline: none; border-color: var(--green); }
+.dp-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; text-align: center; }
+.dp-grid .dow { font-size: 11px; font-weight: 700; color: var(--muted); padding: 4px 0; }
+.dp-grid .day { padding: 7px 0; border-radius: 8px; cursor: pointer; font-size: 14px; }
+.dp-grid .day:hover { background: var(--green-soft); }
+.dp-grid .day.today { outline: 1.5px solid var(--green); }
+.dp-grid .day.sel { background: var(--green); color: #fff; }
+.dp-foot { display: flex; justify-content: space-between; margin-top: 8px; }
+.dp-foot button {
+  border: none; background: transparent; color: var(--green-dark);
+  font-weight: 600; font-size: 13px; cursor: pointer; padding: 4px 6px;
+}
+.dp-foot button:hover { text-decoration: underline; }
+
+.row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media (max-width: 420px) { .row-2 { grid-template-columns: 1fr; } }
+
+.error-msg { color: var(--danger); font-size: 12px; margin-top: 5px; display: none; }
+.field.invalid .input, .field.invalid textarea { border-color: var(--danger); }
+.field.invalid .error-msg { display: block; }
+
+.actions { margin-top: 24px; }
+.btn {
+  width: 100%; border: none; border-radius: 12px; padding: 16px;
+  font-size: 16px; font-weight: 700; cursor: pointer; font-family: inherit;
+  transition: transform 0.05s ease, background 0.15s ease;
+}
+.btn-primary { background: var(--green); color: #fff; box-shadow: var(--shadow); }
+.btn-primary:hover { background: var(--green-dark); }
+.btn-primary:active { transform: scale(0.99); }
+.btn-ghost { background: transparent; color: var(--muted); margin-top: 8px; font-weight: 600; }
+.btn-ghost:hover { color: var(--ink); }
+
+footer.note { text-align: center; color: var(--muted); font-size: 12px; margin-top: 22px; }
+
+/* Desktop: tombol sejajar di kanan, tidak full-width */
+@media (min-width: 560px) {
+  .actions { display: flex; justify-content: flex-end; align-items: center; gap: 12px; }
+  .actions .btn { width: auto; padding: 13px 24px; }
+  .btn-ghost { order: 0; margin-top: 0; }
+  .btn-primary { order: 1; }
+}
