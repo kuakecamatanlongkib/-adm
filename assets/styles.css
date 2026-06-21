@@ -7,76 +7,140 @@
   --line: #dfe5ea;
   --bg: #f4f6f8;
   --danger: #c0392b;
-  --radius: 14px;
+  --radius: 12px;
   --shadow: 0 6px 24px rgba(0, 0, 0, 0.08);
 }
 * { box-sizing: border-box; }
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   background: var(--bg);
   color: var(--ink);
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
-.app { max-width: 640px; margin: 0 auto; padding: 0 16px 48px; }
+.app { max-width: 560px; margin: 0 auto; padding: 0 16px 32px; }
 
-header.hero { text-align: center; padding: 28px 16px 22px; }
+header.hero { text-align: center; padding: 20px 16px 14px; }
 header.hero .badge {
-  width: 56px; height: 56px; border-radius: 16px;
+  width: 42px; height: 42px; border-radius: 12px;
   background: var(--green); color: #fff;
   display: inline-flex; align-items: center; justify-content: center;
-  font-size: 26px; margin-bottom: 12px; box-shadow: var(--shadow);
+  font-size: 19px; margin-bottom: 8px; box-shadow: var(--shadow);
 }
-header.hero h1 { font-size: 20px; margin: 0 0 4px; letter-spacing: -0.01em; }
-header.hero p { margin: 0; color: var(--muted); font-size: 14px; }
+header.hero h1 { font-size: 16px; font-weight: 500; margin: 0 0 3px; letter-spacing: -0.01em; }
+header.hero p { margin: 0; color: var(--muted); font-size: 12.5px; }
 
 .card {
   background: #fff; border: 1px solid var(--line);
-  border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px;
+  border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px;
 }
 
 .section-label {
-  font-size: 12px; font-weight: 700; text-transform: uppercase;
-  letter-spacing: 0.06em; color: var(--muted); margin: 4px 0 10px;
+  font-size: 10.5px; font-weight: 500; text-transform: uppercase;
+  letter-spacing: 0.06em; color: var(--muted); margin: 2px 0 8px;
 }
 
-/* Pemilih template */
-.picker { margin-bottom: 6px; }
-select.tpl {
-  width: 100%; border: 1.5px solid var(--line); border-radius: 10px;
-  padding: 12px 14px; font-size: 16px; font-family: inherit;
-  background: #fff; color: var(--ink); appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236b7682' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
-  background-repeat: no-repeat; background-position: right 14px center;
-}
-select.tpl:focus { outline: none; border-color: var(--green); box-shadow: 0 0 0 3px var(--green-soft); }
-.tpl-desc { font-size: 13px; color: var(--muted); margin: 8px 2px 22px; min-height: 18px; }
+/* Pemilih template: dropdown (tertutup) berisi kartu per kategori */
+.tpl-picker { position: relative; margin-bottom: 18px; }
 
-.field { margin-bottom: 16px; }
-.field label.flabel { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+/* Pemicu dropdown */
+.tpl-select {
+  display: flex; align-items: center; gap: 8px; width: 100%; cursor: pointer;
+  border: 1.5px solid var(--line); border-radius: 10px; background: #fff;
+  padding: 10px 12px; text-align: left; font-family: inherit;
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+.tpl-select:hover { border-color: #c4ddd0; }
+.tpl-picker.open .tpl-select { border-color: var(--green); box-shadow: 0 0 0 3px var(--green-soft); }
+.tpl-select-label { flex: 1 1 auto; min-width: 0; font-size: 13.5px; font-weight: 500; color: var(--ink); }
+.tpl-select-label.is-placeholder { font-weight: 400; color: var(--muted); }
+.fields-empty { color: var(--muted); font-size: 13px; margin: 2px 2px 0; }
+.tpl-select-chevron {
+  flex: 0 0 auto; width: 16px; height: 16px; transition: transform .18s ease;
+  background: no-repeat center / 18px url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%236b7682' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+}
+.tpl-picker.open .tpl-select-chevron { transform: rotate(180deg); }
+
+/* Panel menu yang muncul */
+.tpl-menu {
+  position: absolute; top: calc(100% + 6px); left: 0; right: 0; z-index: 50;
+  background: #fff; border: 1px solid var(--line); border-radius: 12px;
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.16); padding: 12px;
+  max-height: 64vh; overflow-y: auto; display: none;
+}
+.tpl-picker.open .tpl-menu { display: block; }
+
+.tpl-cat { margin-bottom: 14px; }
+.tpl-cat:last-child { margin-bottom: 0; }
+.tpl-cat-title {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 10px; font-weight: 500; text-transform: uppercase;
+  letter-spacing: 0.07em; color: var(--muted); margin: 0 2px 8px;
+}
+.tpl-cat-title span:first-child { flex: 0 0 auto; }
+.tpl-cat-title::after {
+  content: ""; flex: 1 1 auto; height: 1px; background: var(--line);
+}
+.tpl-cat-count {
+  flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center;
+  min-width: 17px; height: 17px; padding: 0 5px; border-radius: 999px;
+  background: var(--green-soft); color: var(--green-dark);
+  font-size: 10px; font-weight: 500; letter-spacing: 0;
+}
+.tpl-card {
+  display: block; width: 100%; text-align: left; cursor: pointer;
+  border: 1.5px solid var(--line); border-radius: 9px; background: #fff;
+  padding: 10px 40px 10px 12px; margin-bottom: 7px; position: relative;
+  font-family: inherit; transition: border-color .15s ease, box-shadow .15s ease, background .15s ease, transform .05s ease;
+}
+.tpl-card:last-child { margin-bottom: 0; }
+.tpl-card:hover { border-color: #c4ddd0; background: #fbfdfc; }
+.tpl-card:active { transform: scale(0.995); }
+.tpl-card-name { display: block; font-size: 13px; font-weight: 500; color: var(--ink); line-height: 1.3; }
+.tpl-card-desc { display: block; font-size: 11.5px; color: var(--muted); margin-top: 2px; line-height: 1.4; }
+.tpl-card.active {
+  border-color: var(--green); background: var(--green-soft);
+  box-shadow: 0 0 0 3px rgba(0, 105, 62, 0.12);
+}
+.tpl-card.active .tpl-card-name { color: var(--green-dark); }
+/* Penanda terpilih (lingkaran + centang) di kanan kartu */
+.tpl-card::after {
+  content: ""; position: absolute; right: 13px; top: 50%; margin-top: -9px;
+  width: 18px; height: 18px; border-radius: 50%;
+  border: 2px solid var(--line); background: #fff; transition: all .15s ease;
+}
+.tpl-card.active::after {
+  border-color: var(--green); background-color: var(--green);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: center;
+}
+
+.field { margin-bottom: 11px; }
+.field label.flabel { display: block; font-size: 12px; font-weight: 500; margin-bottom: 4px; }
 .field label.flabel .req { color: var(--danger); }
 
 .input, textarea {
-  width: 100%; border: 1.5px solid var(--line); border-radius: 10px;
-  padding: 12px 14px; font-size: 16px; font-family: inherit; color: var(--ink);
+  width: 100%; border: 1.5px solid var(--line); border-radius: 9px;
+  padding: 8px 11px; font-size: 13.5px; font-family: inherit; color: var(--ink);
   background: #fff; transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 .input:focus, textarea:focus { outline: none; border-color: var(--green); box-shadow: 0 0 0 3px var(--green-soft); }
-textarea { resize: vertical; min-height: 72px; }
+textarea { resize: vertical; min-height: 56px; }
 
 select.input {
   appearance: none;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236b7682' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
-  background-repeat: no-repeat; background-position: right 14px center; padding-right: 40px;
+  background-repeat: no-repeat; background-position: right 11px center; padding-right: 34px;
 }
 
 /* Datepicker custom */
 .dp { position: relative; }
-.dp-display { cursor: pointer; padding-right: 40px; background: #fff; }
+.dp-display { cursor: pointer; padding-right: 34px; background: #fff; }
 .dp-icon {
-  position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
-  pointer-events: none; font-size: 16px; opacity: 0.75;
+  position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+  pointer-events: none; font-size: 14px; opacity: 0.75;
 }
 .dp-pop {
   position: absolute; z-index: 50; top: calc(100% + 6px); left: 0;
@@ -98,7 +162,7 @@ select.input {
 }
 .dp-sel select:focus { outline: none; border-color: var(--green); }
 .dp-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; text-align: center; }
-.dp-grid .dow { font-size: 11px; font-weight: 700; color: var(--muted); padding: 4px 0; }
+.dp-grid .dow { font-size: 11px; font-weight: 500; color: var(--muted); padding: 4px 0; }
 .dp-grid .day { padding: 7px 0; border-radius: 8px; cursor: pointer; font-size: 14px; }
 .dp-grid .day:hover { background: var(--green-soft); }
 .dp-grid .day.today { outline: 1.5px solid var(--green); }
@@ -106,35 +170,54 @@ select.input {
 .dp-foot { display: flex; justify-content: space-between; margin-top: 8px; }
 .dp-foot button {
   border: none; background: transparent; color: var(--green-dark);
-  font-weight: 600; font-size: 13px; cursor: pointer; padding: 4px 6px;
+  font-weight: 500; font-size: 13px; cursor: pointer; padding: 4px 6px;
 }
 .dp-foot button:hover { text-decoration: underline; }
 
-.row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 @media (max-width: 420px) { .row-2 { grid-template-columns: 1fr; } }
 
-.error-msg { color: var(--danger); font-size: 12px; margin-top: 5px; display: none; }
+/* Field daftar dinamis (type: 'list') */
+.list { display: flex; flex-direction: column; gap: 6px; }
+.list-row { display: flex; gap: 6px; align-items: center; }
+.list-row .list-input { flex: 1 1 auto; }
+.list-del {
+  flex: 0 0 auto; width: 38px; align-self: stretch; cursor: pointer;
+  border: 1.5px solid var(--line); border-radius: 9px; background: #fff;
+  color: var(--muted); font-size: 14px; line-height: 1;
+}
+.list-del:hover { border-color: var(--danger); color: var(--danger); }
+.list-add {
+  margin-top: 6px; align-self: flex-start; cursor: pointer; font-family: inherit;
+  background: var(--green-soft); color: var(--green-dark); border: none;
+  border-radius: 9px; padding: 7px 13px; font-size: 12.5px; font-weight: 500;
+}
+.list-add:hover { background: #d6e9df; }
+
+.error-msg { color: var(--danger); font-size: 11px; margin-top: 4px; display: none; }
 .field.invalid .input, .field.invalid textarea { border-color: var(--danger); }
 .field.invalid .error-msg { display: block; }
 
-.actions { margin-top: 24px; }
+.actions { margin-top: 16px; }
 .btn {
-  width: 100%; border: none; border-radius: 12px; padding: 16px;
-  font-size: 16px; font-weight: 700; cursor: pointer; font-family: inherit;
+  width: 100%; border: none; border-radius: 10px; padding: 10px 16px;
+  font-size: 13.5px; font-weight: 500; cursor: pointer; font-family: inherit;
+  display: inline-flex; align-items: center; justify-content: center; gap: 7px;
   transition: transform 0.05s ease, background 0.15s ease;
 }
+.btn svg { flex: 0 0 auto; width: 16px; height: 16px; }
 .btn-primary { background: var(--green); color: #fff; box-shadow: var(--shadow); }
 .btn-primary:hover { background: var(--green-dark); }
 .btn-primary:active { transform: scale(0.99); }
-.btn-ghost { background: transparent; color: var(--muted); margin-top: 8px; font-weight: 600; }
+.btn-ghost { background: transparent; color: var(--muted); margin-top: 6px; font-weight: 500; }
 .btn-ghost:hover { color: var(--ink); }
 
-footer.note { text-align: center; color: var(--muted); font-size: 12px; margin-top: 22px; }
+footer.note { text-align: center; color: var(--muted); font-size: 11.5px; margin-top: 16px; }
 
 /* Desktop: tombol sejajar di kanan, tidak full-width */
 @media (min-width: 560px) {
-  .actions { display: flex; justify-content: flex-end; align-items: center; gap: 12px; }
-  .actions .btn { width: auto; padding: 13px 24px; }
+  .actions { display: flex; justify-content: flex-end; align-items: center; gap: 10px; }
+  .actions .btn { width: auto; padding: 9px 18px; }
   .btn-ghost { order: 0; margin-top: 0; }
   .btn-primary { order: 1; }
 }

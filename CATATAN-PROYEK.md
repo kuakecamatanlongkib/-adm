@@ -38,7 +38,7 @@ kua-longkib/
    ├─ config.js          # identitas kantor: KOP + tanda tangan (dipakai semua surat)
    ├─ templates.js       # ★ KATALOG SURAT + pustaka field  ← edit di sini
    ├─ datepicker.js      # komponen kalender custom (tampil dd/mm/yyyy, simpan ISO)
-   ├─ app.js             # logika form (bangun field dinamis, validasi, transform)
+   ├─ app.js             # logika form (pemilih kartu, bangun field dinamis, validasi, transform)
    └─ surat.js           # logika render surat dari template + data
 ```
 
@@ -46,6 +46,11 @@ kua-longkib/
 Form dan surat **dibangun otomatis dari katalog** di `assets/templates.js`.
 Menambah surat baru = menambah **satu objek** di `KUA_TEMPLATES` (tidak menyentuh HTML).
 
+- **Pemilih surat (halaman form):** **dropdown** (tertutup secara default) yang isinya
+  **kartu** dikelompokkan per kategori (judul kategori + badge jumlah + kartu nama/deskripsi,
+  kartu aktif bertanda centang). Pemicu menampilkan surat terpilih; klik di luar menutup menu.
+  Dibangun otomatis dari `KUA_TEMPLATES` di `app.js`. Font UI web = **Inter**
+  (dimuat dari Google Fonts; offline jatuh ke font sistem). Font PDF tetap Times (`surat.css`).
 - `config.js` → `KUA_CONFIG`: KOP (logo, baris instansi, alamat, kota) & blok tanda tangan.
   Ubah identitas kantor / penanda tangan cukup di sini, berlaku ke semua surat.
 - `templates.js` →
@@ -72,7 +77,10 @@ Menambah surat baru = menambah **satu objek** di `KUA_TEMPLATES` (tidak menyentu
 ```
 
 ### Fitur field (di `KUA_FIELDS`)
-- `type`: `text` | `textarea` | `date` (pakai datepicker custom) | `select`
+- `type`: `text` | `textarea` | `date` (pakai datepicker custom) | `select` | `list`
+- `list` → daftar **dinamis**: tombol "+ Tambah" untuk menambah baris, tombol ✕ untuk
+  hapus. Disimpan sebagai beberapa nilai dipisah baris-baru; baris kosong diabaikan.
+  Opsi: `addLabel` (teks tombol tambah). Dipakai surat N7 (daftar syarat/alasan).
 - `half: true` → ditata 2 kolom berdampingan dengan field `half` berikutnya
 - `default: 'today'` → tanggal otomatis hari ini
 - `validate(v)` → kembalikan pesan error atau null (mis. NIK 16 digit)
@@ -84,11 +92,26 @@ Menambah surat baru = menambah **satu objek** di `KUA_TEMPLATES` (tidak menyentu
 - `select` dengan `options:[...]`, opsional `otherValue` → memunculkan kolom teks "lainnya".
   Dipakai: pekerjaan.
 
-## Template yang sudah ada (3)
+## Template yang sudah ada (4)
 1. `puskesmas-laki` — Pengantar Puskesmas, calon pengantin **laki-laki** (pemeriksaan kesehatan).
 2. `puskesmas-perempuan` — Pengantar Puskesmas, calon pengantin **perempuan** (imunisasi TT & cek kehamilan).
 3. `dispensasi-nikah` — Permohonan **Dispensasi Nikah** ke Camat (2 orang: calon suami & istri,
    rencana akad, 2 paragraf isi). Pakai `compact: true` agar muat 1 halaman.
+4. `n7-penolakan-kehendak` — **Formulir Model N7** (pemberitahuan/penolakan kehendak nikah/rujuk).
+   Pakai tata letak formulir (`formLayout`): kop tengah tanpa logo & tanpa garis, ada `lampiranRef`,
+   `judulFormulir`, `modelKode`, `kopBaris`, `tanggalTanpaKota`. Dua blok pilihan berkotak centang
+   (□, dicentang tangan) dengan daftar syarat **dinamis** dari field `list`. Penutup `wassalam: true`.
+
+### Properti khusus tata letak formulir (dipakai N7)
+- `formLayout: true` → kop teks rata tengah tanpa logo/garis (bukan kop 3 kolom standar).
+- `lampiranRef: [...]` → teks kecil kiri atas (mis. "Lampiran XI" / dasar hukum).
+- `judulFormulir`, `modelKode` → judul formulir di tengah + kode model di kanan.
+- `kopBaris: [...]` → baris instansi pada kop polos (terpisah dari `config.js`).
+- `tanggalTanpaKota: true` → tanggal tampil tanpa awalan kota ("Longkib, ").
+- `metaRows: [{label,value(d)}]` → baris meta tambahan setelah "Nomor" (mis. Lampiran, Perihal).
+- `checklist: [{heading, listKey}]` → blok □ + daftar bernomor; `listKey` menunjuk field `list`.
+- `wassalam: true` → tampilkan "Wassalam," di atas blok tanda tangan.
+- `tujuan`/`pembuka` kini boleh berisi **fungsi** `function(d)` untuk baris/paragraf dinamis.
 
 ## Cara menambah template baru
 1. (Bila perlu field baru) tambahkan di `KUA_FIELDS` (`assets/templates.js`).

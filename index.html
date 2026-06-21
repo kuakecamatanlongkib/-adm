@@ -4,6 +4,9 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Surat KUA Longkib</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" />
 <link rel="stylesheet" href="assets/styles.css" />
 </head>
 <body>
@@ -16,16 +19,16 @@
 
     <form id="suratForm" class="card" novalidate>
       <div class="section-label">Jenis Surat</div>
-      <div class="picker">
-        <select id="tplSelect" class="tpl"></select>
-      </div>
-      <div class="tpl-desc" id="tplDesc"></div>
+      <div class="tpl-picker" id="tplPicker"></div>
 
       <div class="section-label">Data</div>
       <div id="fields"><!-- field dibangun otomatis dari template --></div>
 
       <div class="actions">
-        <button type="submit" class="btn btn-primary">Buat Surat &amp; Cetak PDF</button>
+        <button type="submit" class="btn btn-primary">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+          Print Preview
+        </button>
         <button type="button" id="btnReset" class="btn btn-ghost">Kosongkan Form</button>
       </div>
     </form>

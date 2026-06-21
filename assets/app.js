@@ -7,32 +7,79 @@
   document.getElementById('appTitle').textContent = CONFIG.appName || 'Surat KUA';
   document.title = CONFIG.appName || 'Surat KUA';
 
-  var selectEl = document.getElementById('tplSelect');
-  var descEl = document.getElementById('tplDesc');
+  var pickerEl = document.getElementById('tplPicker');
   var fieldsEl = document.getElementById('fields');
   var form = document.getElementById('suratForm');
 
-  // --- Bangun menu template (dikelompokkan per kategori) ---
+  var currentId = null;   // belum ada surat terpilih sampai staf memilih
+
+  // --- Bangun pemilih template berupa kartu, dikelompokkan per kategori ---
   var groups = {};
   TEMPLATES.forEach(function (t) {
     var k = t.kategori || 'Lainnya';
     (groups[k] = groups[k] || []).push(t);
   });
+  function tplName(id) {
+    var t = TEMPLATES.filter(function (t) { return t.id === id; })[0];
+    return t ? t.nama : '— Pilih —';
+  }
+
+  var menuHTML = '';
   Object.keys(groups).forEach(function (kat) {
-    var og = document.createElement('optgroup');
-    og.label = kat;
+    menuHTML += '<div class="tpl-cat">' +
+      '<div class="tpl-cat-title"><span>' + KUAUtil.esc(kat) + '</span>' +
+      '<span class="tpl-cat-count">' + groups[kat].length + '</span></div>';
     groups[kat].forEach(function (t) {
-      var opt = document.createElement('option');
-      opt.value = t.id;
-      opt.textContent = t.nama;
-      og.appendChild(opt);
+      menuHTML += '<button type="button" class="tpl-card' + (t.id === currentId ? ' active' : '') +
+        '" data-id="' + KUAUtil.esc(t.id) + '">' +
+        '<span class="tpl-card-name">' + KUAUtil.esc(t.nama) + '</span>' +
+        (t.deskripsi ? '<span class="tpl-card-desc">' + KUAUtil.esc(t.deskripsi) + '</span>' : '') +
+        '</button>';
     });
-    selectEl.appendChild(og);
+    menuHTML += '</div>';
   });
 
+  // Pemicu (tertutup) + menu kartu yang muncul saat diklik
+  pickerEl.innerHTML =
+    '<button type="button" class="tpl-select" id="tplTrigger" aria-haspopup="listbox" aria-expanded="false">' +
+      '<span class="tpl-select-label is-placeholder" id="tplTriggerLabel">Pilih Jenis Surat</span>' +
+      '<span class="tpl-select-chevron" aria-hidden="true"></span>' +
+    '</button>' +
+    '<div class="tpl-menu" id="tplMenu" role="listbox">' + menuHTML + '</div>';
+
+  var trigger = document.getElementById('tplTrigger');
+  var menu = document.getElementById('tplMenu');
+  var triggerLabel = document.getElementById('tplTriggerLabel');
+
+  function openMenu() { pickerEl.classList.add('open'); trigger.setAttribute('aria-expanded', 'true'); }
+  function closeMenu() { pickerEl.classList.remove('open'); trigger.setAttribute('aria-expanded', 'false'); }
+
   function currentTemplate() {
-    return TEMPLATES.filter(function (t) { return t.id === selectEl.value; })[0] || TEMPLATES[0];
+    return TEMPLATES.filter(function (t) { return t.id === currentId; })[0] || null;
   }
+
+  trigger.addEventListener('click', function () {
+    if (pickerEl.classList.contains('open')) closeMenu(); else openMenu();
+  });
+
+  // Pilih kartu -> tandai aktif, perbarui label, tutup menu, bangun ulang form
+  menu.addEventListener('click', function (e) {
+    var card = e.target.closest('.tpl-card');
+    if (!card) return;
+    if (!card.classList.contains('active')) {
+      currentId = card.getAttribute('data-id');
+      menu.querySelectorAll('.tpl-card').forEach(function (c) { c.classList.toggle('active', c === card); });
+      triggerLabel.textContent = tplName(currentId);
+      triggerLabel.classList.remove('is-placeholder');
+      buildForm(currentTemplate());
+    }
+    closeMenu();
+  });
+
+  // Klik di luar area pemilih -> tutup menu
+  document.addEventListener('click', function (e) {
+    if (!pickerEl.contains(e.target)) closeMenu();
+  });
 
   // Aturan transformasi nilai input (mis. awal kata jadi huruf besar)
   function applyTransform(name, value) {
@@ -84,6 +131,18 @@
           (def.otherPlaceholder ? 'placeholder="' + def.otherPlaceholder + '" ' : '') +
           'style="display:none;margin-top:8px;" autocomplete="off" />';
       }
+    } else if (def.type === 'list') {
+      // Daftar dinamis: satu baris awal + tombol "Tambah". Baris bisa ditambah/dihapus.
+      var ph = def.placeholder ? ' placeholder="' + def.placeholder + '"' : '';
+      control =
+        '<div class="list" id="f_' + key + '" data-key="' + key + '">' +
+          '<div class="list-row">' +
+            '<input class="input list-input" type="text"' + ph + ' autocomplete="off" />' +
+            '<button type="button" class="list-del" tabindex="-1" aria-label="Hapus baris">✕</button>' +
+          '</div>' +
+        '</div>' +
+        '<button type="button" class="list-add" data-target="' + key + '">' +
+          KUAUtil.esc(def.addLabel || '+ Tambah') + '</button>';
     } else {
       control = '<input class="input" type="' + (def.type || 'text') + '" ' + attrs + ' autocomplete="off" />';
     }
@@ -95,8 +154,12 @@
       '</div>';
   }
 
+  // Tampilan saat belum ada jenis surat dipilih
+  function showEmptyState() {
+    fieldsEl.innerHTML = '<p class="fields-empty">Pilih jenis surat terlebih dahulu untuk menampilkan formulir.</p>';
+  }
+
   function buildForm(tpl) {
-    descEl.textContent = tpl.deskripsi || '';
     var keys = tpl.formFields || [];
     var html = '';
     var i = 0;
@@ -157,9 +220,19 @@
     });
   }
 
-  // Baca nilai akhir sebuah field (menangani select + opsi "lainnya")
+  // Baca nilai akhir sebuah field (menangani select, opsi "lainnya", dan daftar dinamis)
   function readField(def, key) {
     var el = document.getElementById('f_' + key);
+    if (def.type === 'list') {
+      var items = [];
+      if (el) {
+        el.querySelectorAll('.list-input').forEach(function (inp) {
+          var t = inp.value.trim();
+          if (t) items.push(t);
+        });
+      }
+      return items.join('\n');   // beberapa nilai dipisah baris-baru (kosong diabaikan)
+    }
     if (def.type === 'select') {
       var v = el ? el.value : '';
       if (def.otherValue && v === def.otherValue) {
@@ -201,11 +274,32 @@
     return { ok: ok, data: data, firstBad: firstBad };
   }
 
-  selectEl.addEventListener('change', function () { buildForm(currentTemplate()); });
+  // Tambah / hapus baris pada field tipe 'list' (delegasi: cukup dipasang sekali).
+  fieldsEl.addEventListener('click', function (e) {
+    var add = e.target.closest('.list-add');
+    if (add) {
+      var cont = document.getElementById('f_' + add.getAttribute('data-target'));
+      if (cont) {
+        var clone = cont.querySelector('.list-row').cloneNode(true);
+        clone.querySelector('.list-input').value = '';
+        cont.appendChild(clone);
+        clone.querySelector('.list-input').focus();
+      }
+      return;
+    }
+    var del = e.target.closest('.list-del');
+    if (del) {
+      var box = del.closest('.list');
+      var rows = box.querySelectorAll('.list-row');
+      if (rows.length > 1) del.closest('.list-row').remove();
+      else box.querySelector('.list-input').value = '';   // baris terakhir: kosongkan saja
+    }
+  });
 
   form.addEventListener('submit', function (e) {
     e.preventDefault();
     var tpl = currentTemplate();
+    if (!tpl) { openMenu(); return; }   // belum memilih jenis surat -> buka menu
     var res = collectAndValidate(tpl);
     if (!res.ok) {
       var w = fieldsEl.querySelector('[data-field="' + res.firstBad + '"]');
@@ -217,9 +311,10 @@
   });
 
   document.getElementById('btnReset').addEventListener('click', function () {
-    buildForm(currentTemplate());
+    var tpl = currentTemplate();
+    if (tpl) buildForm(tpl); else showEmptyState();
   });
 
-  // Init
-  buildForm(currentTemplate());
+  // Init: belum ada surat terpilih -> tampilkan petunjuk
+  showEmptyState();
 })();

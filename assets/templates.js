@@ -101,7 +101,27 @@ window.KUA_FIELDS = {
   tglIstri: { label: 'Tanggal Lahir', type: 'date', required: true, half: true },
   alamatIstri: { label: 'Alamat', type: 'textarea', required: true, transform: 'titlecaseall', placeholder: 'Alamat lengkap' },
 
-  rencanaAkad: { label: 'Rencana Akad Nikah', type: 'date', required: true }
+  rencanaAkad: { label: 'Rencana Akad Nikah', type: 'date', required: true },
+
+  // --- Field untuk Formulir N7 (penolakan/pemberitahuan kehendak nikah/rujuk) ---
+  jenis: { label: 'Jenis Kehendak', type: 'select', required: true, options: ['Nikah', 'Rujuk'] },
+  calonPengantinWali: {
+    label: 'Calon Pengantin / Wali (yang dituju)', type: 'text', required: true, transform: 'titlecase',
+    placeholder: 'contoh: Sintia Sari Binti Tulia Situmorang'
+  },
+  calonSuami: { label: 'Nama Calon Suami', type: 'text', required: true, half: true, transform: 'titlecase', placeholder: 'contoh: Lamyadi' },
+  calonIstri: { label: 'Nama Calon Istri', type: 'text', required: true, half: true, transform: 'titlecase', placeholder: 'contoh: Sintia Sari' },
+
+  // type 'list' -> bisa tambah/hapus baris (jumlah dinamis). Disimpan sebagai
+  // beberapa nilai dipisah baris-baru; baris kosong diabaikan saat surat dibuat.
+  syaratDapat: {
+    label: 'Syarat yang harus dilengkapi', type: 'list', addLabel: '+ Tambah syarat',
+    placeholder: 'Tulis satu syarat, lalu “Tambah syarat” untuk baris berikutnya'
+  },
+  syaratTolak: {
+    label: 'Alasan penolakan', type: 'list', addLabel: '+ Tambah alasan',
+    placeholder: 'contoh: Umur calon pengantin Perempuan kurang dari 19 tahun'
+  }
 };
 
 /* ---------------------------------------------------------------------------
@@ -189,6 +209,59 @@ window.KUA_TEMPLATES = [
       'Namun, mengingat adanya alasan yang bersifat mendesak, kami mohon kepada Bapak Camat untuk dapat kiranya memberikan persetujuan dispensasi agar proses pencatatan pernikahan dapat dilanjutkan.'
     ],
     penutup: 'Demikian atas perhatian dan kerjasama yang baik kami ucapkan terimakasih.'
+  },
+
+  {
+    id: 'n7-penolakan-kehendak',
+    nama: 'Formulir Penolakan Kehendak Nikah Rujuk (Model N7)',
+    kategori: 'Lampiran Kep. Dirjen Bimas Islam',
+    deskripsi: 'Formulir N7 — pemberitahuan kekurangan syarat / penolakan kehendak nikah atau rujuk.',
+
+    // --- Tata letak khusus formulir (beda dari surat biasa) ---
+    formLayout: true,                                   // kop tengah tanpa logo & tanpa garis
+    lampiranRef: ['Lampiran XI', 'Keputusan Dirjen Bimas Islam No. 473 Tahun 2020'],
+    judulFormulir: 'Formulir Penolakan Kehendak Nikah Rujuk',
+    modelKode: 'Model N 7',
+    kopBaris: ['KANTOR URUSAN AGAMA', 'KECAMATAN LONGKIB', 'KOTA SUBULUSSALAM'],
+    tanggalTanpaKota: true,                             // tanggal saja, tanpa "Longkib,"
+
+    formFields: [
+      'nomor', 'tanggal', 'jenis', 'calonPengantinWali',
+      'calonSuami', 'calonIstri',
+      '#Syarat bila DAPAT dilaksanakan', 'syaratDapat',
+      '#Alasan bila DITOLAK', 'syaratTolak'
+    ],
+
+    // Baris tambahan di blok nomor (selain "Nomor")
+    metaRows: [
+      { label: 'Lampiran', value: '1 (Satu) Berkas' },
+      { label: 'Perihal', value: function (d) { return 'Pemberitahuan kekurangan syarat penolakan kehendak ' + (d.jenis || ''); } }
+    ],
+
+    tujuan: [
+      'Kepada Yth,',
+      'Calon Pengantin / Wali',
+      function (d) { return d.calonPengantinWali; },
+      'Di',
+      'Tempat'
+    ],
+    salam: false,
+    pembuka: function (d) {
+      return 'Dengan hormat, setelah dilakukan pemeriksaan terhadap persyaratan pendaftaran pernikahan ' +
+        'yang diatur dalam perundang-undangan bahwa permohonan pendaftaran ' + (d.jenis || '') +
+        ' Saudara ' + (d.calonSuami || '') + ' dengan Saudari ' + (d.calonIstri || '') +
+        ' diberitahukan sebagai berikut:';
+    },
+
+    // Dua blok pilihan berkotak centang (□). Daftar diambil dari field tipe 'list';
+    // hanya baris yang diisi yang ditampilkan (tanpa garis kosong).
+    checklist: [
+      { heading: 'Pernikahan dapat dilaksanakan dengan melengkapi persyaratan :', listKey: 'syaratDapat' },
+      { heading: 'Tidak dapat dilaksanakan (ditolak) karena tidak melengkapi persyaratan berupa :', listKey: 'syaratTolak' }
+    ],
+
+    penutup: 'Demikian agar menjadi maklum.',
+    wassalam: true                                      // tampilkan "Wassalam," di atas blok tanda tangan
   }
 
   /*

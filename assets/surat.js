@@ -12,6 +12,9 @@
   var tpl = TEMPLATES.filter(function (t) { return t.id === data.__t; })[0] || TEMPLATES[0];
 
   function val(v) { return typeof v === 'function' ? v(data) : v; }
+  function metaRow(label, value) {
+    return '<tr><td class="label">' + esc(label) + '</td><td class="sep">:</td><td>' + esc(value) + '</td></tr>';
+  }
 
   // --- KOP (3 kolom: slot logo kiri, teks tengah, slot penyeimbang kanan) ---
   var kop = CONFIG.kop;
@@ -29,29 +32,72 @@
     '<div class="logo-slot">' + logoImg + '</div>' +
     '<div class="kop-text">' + teks + '</div>';
 
-  // --- META: tanggal & nomor ---
-  var metaHTML = '<div class="tgl">' +
-    esc(kop.kota || '') + (kop.kota ? ', ' : '') + esc(KUAUtil.tglIndo(data.tanggal)) + '</div>';
-  if (tpl.nomor !== false && data.nomor) {
-    metaHTML += '<table class="nomor"><tr>' +
-      '<td class="label">Nomor</td><td class="sep">:</td><td>' + esc(data.nomor) + '</td>' +
-      '</tr></table>';
+  // --- HEADER: kop standar (logo + garis) ATAU tata letak formulir (mis. Model N7) ---
+  var headerHTML;
+  if (tpl.formLayout) {
+    headerHTML =
+      '<div class="lampiran-ref">' + (tpl.lampiranRef || []).map(esc).join('<br />') + '</div>' +
+      '<div class="form-title">' + esc(tpl.judulFormulir || '') + '</div>' +
+      (tpl.modelKode ? '<div class="model-kode">' + esc(tpl.modelKode) + '</div>' : '') +
+      '<div class="kop-plain">' +
+        (tpl.kopBaris || []).map(function (t) { return '<div>' + esc(t) + '</div>'; }).join('') +
+      '</div>';
+  } else {
+    headerHTML = '<div class="kop">' + kopHTML + '</div>' +
+      '<hr class="kop-rule" /><hr class="kop-rule thin" />';
   }
 
-  // --- Tujuan ---
+  // --- META: tanggal & nomor (+ baris meta tambahan: Lampiran/Perihal dll.) ---
+  var tglPrefix = tpl.tanggalTanpaKota ? '' : (esc(kop.kota || '') + (kop.kota ? ', ' : ''));
+  var metaHTML = '<div class="tgl">' + tglPrefix + esc(KUAUtil.tglIndo(data.tanggal)) + '</div>';
+  var hasMetaRows = tpl.metaRows && tpl.metaRows.length;
+  if (tpl.nomor !== false && (data.nomor || hasMetaRows)) {
+    var metaRowsHTML = '';
+    if (data.nomor) metaRowsHTML += metaRow('Nomor', data.nomor);
+    if (hasMetaRows) {
+      tpl.metaRows.forEach(function (r) { metaRowsHTML += metaRow(r.label, val(r.value)); });
+    }
+    metaHTML += '<table class="nomor">' + metaRowsHTML + '</table>';
+  }
+
+  // --- Tujuan (tiap baris boleh berupa fungsi data) ---
   var tujuanHTML = '';
   if (tpl.tujuan && tpl.tujuan.length) {
-    tujuanHTML = '<div class="tujuan">' + tpl.tujuan.map(esc).join('<br />') + '</div>';
+    tujuanHTML = '<div class="tujuan">' +
+      tpl.tujuan.map(function (line) { return esc(val(line)); }).join('<br />') + '</div>';
   }
 
   // --- Salam ---
   var salamHTML = tpl.salam ? '<div class="salam">Assalamu\'alaikum Wr. Wb.</div>' : '';
 
-  // --- Pembuka (boleh banyak paragraf) ---
+  // --- Pembuka (boleh banyak paragraf; tiap paragraf boleh fungsi data) ---
   var pembukaHTML = '';
   if (tpl.pembuka) {
     (Array.isArray(tpl.pembuka) ? tpl.pembuka : [tpl.pembuka]).forEach(function (p) {
-      pembukaHTML += '<p class="pembuka">' + esc(p) + '</p>';
+      pembukaHTML += '<p class="pembuka">' + esc(val(p)) + '</p>';
+    });
+  }
+
+  // --- Checklist: blok pilihan berkotak centang (□) + daftar bernomor ---
+  // Daftar diambil dari field tipe 'list' (data[listKey], dipisah baris-baru) atau
+  // dari fungsi blk.items(d). Hanya item terisi yang ditampilkan.
+  var checklistHTML = '';
+  if (tpl.checklist && tpl.checklist.length) {
+    tpl.checklist.forEach(function (blk) {
+      var items = [];
+      if (blk.listKey && data[blk.listKey]) {
+        items = data[blk.listKey].split('\n').filter(function (x) { return x; });
+      } else if (typeof blk.items === 'function') {
+        items = blk.items(data) || [];
+      }
+      if (!items.length) return;   // blok tanpa isi tidak ditampilkan
+      // Blok yang tampil pasti terisi -> kotak otomatis tercentang (☑).
+      checklistHTML += '<div class="check-block">' +
+        '<div class="check-head"><span class="check-box">☑</span>' +
+        '<span>' + esc(val(blk.heading)) + '</span></div>' +
+        '<ol class="syarat">' +
+          items.map(function (it) { return '<li>' + esc(it) + '</li>'; }).join('') + '</ol>' +
+        '</div>';
     });
   }
 
@@ -92,6 +138,7 @@
   // --- Tanda tangan ---
   var ttd = (tpl.ttd) || CONFIG.ttd;
   var ttdHTML = '<div class="ttd"><div class="block">' +
+    (tpl.wassalam ? '<div class="wassalam">Wassalam,</div>' : '') +
     (ttd.jabatan || []).map(esc).join('<br />') +
     '<div class="space"></div>' +
     '<span class="nama">' + esc(ttd.nama) + '</span><br />' +
@@ -103,10 +150,9 @@
 
   // --- Rakit halaman ---
   document.getElementById('page').innerHTML =
-    '<div class="kop">' + kopHTML + '</div>' +
-    '<hr class="kop-rule" /><hr class="kop-rule thin" />' +
+    headerHTML +
     '<div class="meta">' + metaHTML + '</div>' +
-    tujuanHTML + salamHTML + pembukaHTML + dataHTML + isiHTML + penutupHTML + ttdHTML;
+    tujuanHTML + salamHTML + pembukaHTML + dataHTML + checklistHTML + isiHTML + penutupHTML + ttdHTML;
 
   // Judul tab -> nama file PDF default rapi
   document.title = tpl.nama + (data.nama ? ' - ' + data.nama : '');

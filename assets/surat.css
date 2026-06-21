@@ -44,6 +44,21 @@ body {
 .kop-rule { border: none; border-top: 3px solid var(--kop-line); margin: 1px 0 1px; }
 .kop-rule.thin { border-top: 1px solid var(--kop-line); margin: 0 0 14px; }
 
+/* Tata letak formulir (mis. Model N7): kop tengah tanpa logo & tanpa garis */
+.lampiran-ref { text-align: left; margin-bottom: 16px; }
+.form-title { text-align: center; font-weight: bold; text-transform: uppercase; margin: 0; }
+.model-kode { text-align: right; margin: 0 0 12px; }
+.kop-plain { text-align: center; font-weight: bold; margin-bottom: 18px; }
+.kop-plain div { line-height: 1.25; }
+
+/* Blok pilihan berkotak centang (□) + daftar syarat bernomor */
+.check-block { margin: 10px 0; }
+.check-head { display: flex; gap: 8px; align-items: baseline; }
+.check-head .check-box { flex: 0 0 auto; font-size: 13pt; }
+ol.syarat { margin: 4px 0 4px 0; padding-left: 46px; }
+ol.syarat li { padding: 1px 0; text-align: justify; }
+.ttd .wassalam { margin-bottom: 2px; }
+
 /* Isi surat */
 .meta { margin-bottom: 14px; }
 .meta .tgl { text-align: right; margin-bottom: 10px; }
