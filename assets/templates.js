@@ -123,6 +123,14 @@ window.KUA_FIELDS = {
     placeholder: 'contoh: Umur calon pengantin Perempuan kurang dari 19 tahun'
   },
 
+  // --- Field untuk Surat Keterangan Bimbingan Perkawinan (BIMWIN) ---
+  pihak: {
+    label: 'Keterangan untuk', type: 'select', required: true,
+    options: ['Calon Suami', 'Calon Istri'], default: 'Calon Suami'
+  },
+  agama: { label: 'Agama', type: 'text', required: true, default: 'Islam', transform: 'titlecase' },
+  tanggalBimwin: { label: 'Tanggal Mengikuti Bimbingan', type: 'date', required: true },
+
   // --- Penanda tangan (dipakai semua surat, lihat config.js) ---
   penandatangan: {
     label: 'Ditandatangani oleh', type: 'select', required: true,
@@ -149,6 +157,9 @@ function ttl2(tempat, iso) {
   var tg = KUAUtil.tglIndo(iso || '');
   return (tempat || '') + (tempat && tg ? ', ' : '') + tg;
 }
+
+// 'Calon Suami' -> 'calon suami' (untuk disisipkan di tengah kalimat).
+function pihakKecil(d) { return String(d.pihak || '').toLowerCase(); }
 
 /* ---------------------------------------------------------------------------
  *  DAFTAR TEMPLATE
@@ -271,6 +282,52 @@ window.KUA_TEMPLATES = [
 
     penutup: 'Demikian agar menjadi maklum.',
     wassalam: true                                      // tampilkan "Wassalam," di atas blok tanda tangan
+  },
+
+  {
+    id: 'keterangan-bimwin',
+    nama: 'Surat Keterangan Sudah Mengikuti Bimbingan Catin',
+    kategori: 'Surat Keterangan',
+    deskripsi: 'Keterangan telah mengikuti Bimbingan Perkawinan (BIMWIN) bagi calon pengantin.',
+
+    // Judul + nomor di tengah; tanggal hanya di atas blok tanda tangan.
+    judulSurat: 'Surat Keterangan Sudah Mengikuti Bimbingan Catin',
+    tanggalDiTtd: true,
+
+    formFields: [
+      'nomor', 'tanggal', 'pihak',
+      '#Data Calon Pengantin', 'nama', 'nik', 'tempatLahir', 'tanggalLahir',
+      'agama', 'pekerjaan', 'alamat',
+      '#Pelaksanaan Bimbingan', 'tanggalBimwin'
+    ],
+
+    salam: false,
+    pembuka: 'Yang bertanda tangan di bawah ini :',
+
+    // Blok pertama = identitas penanda tangan (ikut pilihan Kepala/Plh di form),
+    // blok kedua = identitas calon pengantin.
+    letterRows: [
+      { label: 'Nama', value: function (d) { return KUAUtil.ttdAktif(d).nama; } },
+      { label: 'NIP', value: function (d) { return KUAUtil.nipSaja(KUAUtil.ttdAktif(d).nip); } },
+      { label: 'Jabatan', value: function (d) { return (KUAUtil.ttdAktif(d).jabatan || []).join(' '); } },
+      { label: 'Kecamatan', value: 'Longkib, Kota Subulussalam' },
+      { text: function (d) { return 'Menerangkan dengan sesungguhnya bahwa ' + pihakKecil(d) + ' :'; } },
+      { label: 'Nama', value: function (d) { return d.nama; } },
+      { label: 'NIK', value: function (d) { return d.nik; } },
+      { label: 'Tempat, Tanggal Lahir', value: function (d) { return KUAUtil.tempatTanggalLahir(d); } },
+      { label: 'Agama', value: function (d) { return d.agama; } },
+      { label: 'Pekerjaan', value: function (d) { return d.pekerjaan; } },
+      { label: 'Alamat', value: function (d) { return d.alamat; } }
+    ],
+
+    isi: function (d) {
+      return 'Benar bahwa nama ' + pihakKecil(d) + ' tersebut di atas telah mengikuti ' +
+        'BIMBINGAN PERKAWINAN (BIMWIN) bagi calon pengantin yang diselenggarakan oleh ' +
+        'Kantor Urusan Agama (KUA) Kecamatan Longkib, Kota Subulussalam pada hari ' +
+        KUAUtil.hariIndo(d.tanggalBimwin) + ' tanggal ' + KUAUtil.tglIndo(d.tanggalBimwin) + '.';
+    },
+    penutup: 'Demikian surat keterangan ini dibuat dengan sebenarnya agar dapat dipergunakan ' +
+      'sebagai persyaratan kelengkapan administrasi pernikahan di KUA.'
   }
 
   /*

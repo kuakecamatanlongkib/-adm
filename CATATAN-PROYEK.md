@@ -107,7 +107,7 @@ Bila Kepala KUA cuti atau dinas luar, surat ditandatangani **Plh.**
 - Sebuah template masih bisa **memaksa** penanda tangan sendiri lewat properti `ttd`;
   bila diisi, dropdown tidak ditambahkan ke form surat itu.
 
-## Template yang sudah ada (4)
+## Template yang sudah ada (5)
 1. `puskesmas-laki` — Pengantar Puskesmas, calon pengantin **laki-laki** (pemeriksaan kesehatan).
 2. `puskesmas-perempuan` — Pengantar Puskesmas, calon pengantin **perempuan** (imunisasi TT & cek kehamilan).
 3. `dispensasi-nikah` — Permohonan **Dispensasi Nikah** ke Camat (2 orang: calon suami & istri,
@@ -116,6 +116,19 @@ Bila Kepala KUA cuti atau dinas luar, surat ditandatangani **Plh.**
    Pakai tata letak formulir (`formLayout`): kop tengah tanpa logo & tanpa garis, ada `lampiranRef`,
    `judulFormulir`, `modelKode`, `kopBaris`, `tanggalTanpaKota`. Dua blok pilihan berkotak centang
    (□, dicentang tangan) dengan daftar syarat **dinamis** dari field `list`. Penutup `wassalam: true`.
+
+5. `keterangan-bimwin` — **Surat Keterangan Sudah Mengikuti Bimbingan Catin** (BIMWIN).
+   Judul + nomor di tengah (`judulSurat`), tanpa tujuan & tanpa salam, tanggal hanya di atas
+   blok tanda tangan (`tanggalDiTtd`). Badan surat memuat **dua blok identitas**: penanda tangan
+   (otomatis ikut pilihan Kepala/Plh lewat `KUAUtil.ttdAktif`) lalu calon pengantin.
+   Field `pihak` memilih "Calon Suami"/"Calon Istri" — dipakai di kalimat pengantar sekaligus isi.
+   Nama hari pelaksanaan bimbingan dihitung otomatis dari tanggal (`KUAUtil.hariIndo`).
+
+   > Surat contoh dari KUA menulis "Calon Istri" pada blok data padahal isinya calon suami, dan
+   > memuat beberapa salah ketik ("Tersusun", "di selerenggarakan"). Di template ini ejaan sudah
+   > dirapikan dan pilihan suami/istri dijadikan satu field agar tidak lagi bisa keliru.
+   > Kota pada tanda tangan mengikuti `config.js` (**Longkib**), bukan "Subulussalam" seperti
+   > pada surat contoh, supaya konsisten dengan surat lain.
 
 ### Properti khusus tata letak formulir (dipakai N7)
 - `formLayout: true` → kop teks rata tengah tanpa logo/garis (bukan kop 3 kolom standar).
@@ -127,6 +140,21 @@ Bila Kepala KUA cuti atau dinas luar, surat ditandatangani **Plh.**
 - `checklist: [{heading, listKey}]` → blok □ + daftar bernomor; `listKey` menunjuk field `list`.
 - `wassalam: true` → tampilkan "Wassalam," di atas blok tanda tangan.
 - `tujuan`/`pembuka` kini boleh berisi **fungsi** `function(d)` untuk baris/paragraf dinamis.
+
+### Properti khusus surat keterangan (dipakai BIMWIN)
+- `judulSurat: '...'` → judul tebal bergaris bawah di tengah, dengan "Nomor : ..." di bawahnya.
+  Bila dipakai, nomor **tidak** lagi tampil sebagai baris meta di kiri atas.
+- `tanggalDiTtd: true` → tanggal tidak muncul di kanan atas, melainkan di atas jabatan pada
+  blok tanda tangan.
+- `letterRows` menerima `{ text: '...' | function(d) }` → kalimat biasa (tidak tebal) di antara
+  dua tabel data, mis. "Menerangkan dengan sesungguhnya bahwa calon suami :".
+
+### Helper di `util.js`
+- `KUAUtil.tglIndo(iso)` → "8 Juni 2026"; `KUAUtil.hariIndo(iso)` → "Senin".
+- `KUAUtil.ttdAktif(d)` → entri penanda tangan yang berlaku (pilihan form, atau entri pertama
+  `config.js`). Dipakai `surat.js` untuk blok tanda tangan, dan oleh template yang perlu
+  menyebut identitas penanda tangan di badan surat.
+- `KUAUtil.nipSaja(nip)` → buang awalan "NIP. " untuk baris yang sudah berlabel "NIP".
 
 ## Cara menambah template baru
 1. (Bila perlu field baru) tambahkan di `KUA_FIELDS` (`assets/templates.js`).

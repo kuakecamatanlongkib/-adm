@@ -47,11 +47,21 @@
       '<hr class="kop-rule" /><hr class="kop-rule thin" />';
   }
 
+  // --- JUDUL di tengah + nomor di bawahnya (mis. Surat Keterangan BIMWIN) ---
+  // Bila dipakai, nomor tidak lagi ditampilkan sebagai baris meta di kiri atas.
+  var judulHTML = '';
+  if (tpl.judulSurat) {
+    judulHTML = '<div class="judul-surat">' + esc(tpl.judulSurat) + '</div>' +
+      (data.nomor ? '<div class="judul-nomor">Nomor : ' + esc(data.nomor) + '</div>' : '');
+  }
+
   // --- META: tanggal & nomor (+ baris meta tambahan: Lampiran/Perihal dll.) ---
-  var tglPrefix = tpl.tanggalTanpaKota ? '' : (esc(kop.kota || '') + (kop.kota ? ', ' : ''));
-  var metaHTML = '<div class="tgl">' + tglPrefix + esc(KUAUtil.tglIndo(data.tanggal)) + '</div>';
+  var tglTeks = (tpl.tanggalTanpaKota ? '' : (kop.kota ? kop.kota + ', ' : '')) +
+    KUAUtil.tglIndo(data.tanggal);
+  // tanggalDiTtd -> tanggal muncul di atas blok tanda tangan, bukan di kanan atas.
+  var metaHTML = tpl.tanggalDiTtd ? '' : '<div class="tgl">' + esc(tglTeks) + '</div>';
   var hasMetaRows = tpl.metaRows && tpl.metaRows.length;
-  if (tpl.nomor !== false && (data.nomor || hasMetaRows)) {
+  if (tpl.nomor !== false && !tpl.judulSurat && (data.nomor || hasMetaRows)) {
     var metaRowsHTML = '';
     if (data.nomor) metaRowsHTML += metaRow('Nomor', data.nomor);
     if (hasMetaRows) {
@@ -112,6 +122,11 @@
       if (row.heading != null) {
         flush();
         dataHTML += '<div class="data-head">' + esc(row.heading) + '</div>';
+      } else if (row.text != null) {
+        // Baris kalimat biasa (tidak tebal) di antara dua tabel data,
+        // mis. "Menerangkan dengan sesungguhnya bahwa calon suami :"
+        flush();
+        dataHTML += '<p class="data-text">' + esc(val(row.text)) + '</p>';
       } else if (row.gap) {
         flush();
         dataHTML += '<div class="data-gap"></div>';
@@ -137,15 +152,10 @@
 
   // --- Tanda tangan ---
   // Urutan: penanda tangan paksaan template -> pilihan form (Kepala/Plh) -> default config.
-  function pilihTtd() {
-    if (tpl.ttd) return tpl.ttd;
-    var daftar = CONFIG.penandatangan || [];
-    var dipilih = daftar.filter(function (p) { return p.id === data.penandatangan; })[0];
-    return dipilih || daftar[0];
-  }
-  var ttd = pilihTtd();
+  var ttd = tpl.ttd || KUAUtil.ttdAktif(data);
   var ttdHTML = '<div class="ttd"><div class="block">' +
     (tpl.wassalam ? '<div class="wassalam">Wassalam,</div>' : '') +
+    (tpl.tanggalDiTtd ? '<div class="ttd-tgl">' + esc(tglTeks) + '</div>' : '') +
     (ttd.jabatan || []).map(esc).join('<br />') +
     '<div class="space"></div>' +
     '<span class="nama">' + esc(ttd.nama) + '</span><br />' +
@@ -158,7 +168,8 @@
   // --- Rakit halaman ---
   document.getElementById('page').innerHTML =
     headerHTML +
-    '<div class="meta">' + metaHTML + '</div>' +
+    (metaHTML ? '<div class="meta">' + metaHTML + '</div>' : '') +
+    judulHTML +
     tujuanHTML + salamHTML + pembukaHTML + dataHTML + checklistHTML + isiHTML + penutupHTML + ttdHTML;
 
   // Judul tab -> nama file PDF default rapi

@@ -59,6 +59,13 @@ ol.syarat { margin: 4px 0 4px 0; padding-left: 46px; }
 ol.syarat li { padding: 1px 0; text-align: justify; }
 .ttd .wassalam { margin-bottom: 2px; }
 
+/* Judul di tengah + nomor di bawahnya (surat keterangan) */
+.judul-surat {
+  text-align: center; font-weight: bold; text-transform: uppercase;
+  text-decoration: underline; margin: 4px 0 1px;
+}
+.judul-nomor { text-align: center; margin-bottom: 16px; }
+
 /* Isi surat */
 .meta { margin-bottom: 14px; }
 .meta .tgl { text-align: right; margin-bottom: 10px; }
@@ -76,6 +83,7 @@ table.data td { vertical-align: top; padding: 1px 0; }
 table.data td.label { width: 190px; }
 table.data td.sep { width: 16px; }
 .data-head { font-weight: bold; margin: 8px 0 2px 8px; }
+.data-text { margin: 10px 0 2px; }
 .data-gap { height: 8px; }
 
 .isi { margin: 12px 0; text-align: justify; }
