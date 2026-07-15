@@ -122,8 +122,12 @@
       control = '<textarea ' + attrs + '></textarea>';
     } else if (def.type === 'select') {
       var opts = '<option value="" disabled selected>— Pilih —</option>';
+      // Opsi boleh string ('ASN') atau objek ({ value:'plh', text:'Plh. Kepala KUA' })
+      // bila nilai yang disimpan perlu berbeda dari teks yang ditampilkan.
       (def.options || []).forEach(function (o) {
-        opts += '<option value="' + KUAUtil.esc(o) + '">' + KUAUtil.esc(o) + '</option>';
+        var v = (o && o.value != null) ? o.value : o;
+        var t = (o && o.text != null) ? o.text : o;
+        opts += '<option value="' + KUAUtil.esc(v) + '">' + KUAUtil.esc(t) + '</option>';
       });
       control = '<select class="input" ' + attrs + '>' + opts + '</select>';
       if (def.otherValue) {
@@ -191,6 +195,7 @@
       var el = document.getElementById('f_' + key);
       if (!el || !def) return;
       if (def.default === 'today') el.value = KUAUtil.todayISO();
+      else if (def.default != null) el.value = def.default;   // mis. penanda tangan -> 'kepala'
       if (def.type === 'date') {
         KUADatePicker.create(el.closest('.dp'));
         return;

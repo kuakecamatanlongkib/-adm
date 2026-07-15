@@ -136,7 +136,14 @@
   var penutupHTML = tpl.penutup ? '<p class="penutup">' + esc(tpl.penutup) + '</p>' : '';
 
   // --- Tanda tangan ---
-  var ttd = (tpl.ttd) || CONFIG.ttd;
+  // Urutan: penanda tangan paksaan template -> pilihan form (Kepala/Plh) -> default config.
+  function pilihTtd() {
+    if (tpl.ttd) return tpl.ttd;
+    var daftar = CONFIG.penandatangan || [];
+    var dipilih = daftar.filter(function (p) { return p.id === data.penandatangan; })[0];
+    return dipilih || daftar[0];
+  }
+  var ttd = pilihTtd();
   var ttdHTML = '<div class="ttd"><div class="block">' +
     (tpl.wassalam ? '<div class="wassalam">Wassalam,</div>' : '') +
     (ttd.jabatan || []).map(esc).join('<br />') +

@@ -121,6 +121,15 @@ window.KUA_FIELDS = {
   syaratTolak: {
     label: 'Alasan penolakan', type: 'list', addLabel: '+ Tambah alasan',
     placeholder: 'contoh: Umur calon pengantin Perempuan kurang dari 19 tahun'
+  },
+
+  // --- Penanda tangan (dipakai semua surat, lihat config.js) ---
+  penandatangan: {
+    label: 'Ditandatangani oleh', type: 'select', required: true,
+    options: (window.KUA_CONFIG.penandatangan || []).map(function (p) {
+      return { value: p.id, text: p.label };
+    }),
+    default: (window.KUA_CONFIG.penandatangan[0] || {}).id
   }
 };
 
@@ -286,3 +295,14 @@ window.KUA_TEMPLATES = [
    * }
    */
 ];
+
+/* ---------------------------------------------------------------------------
+ *  Pilihan penanda tangan (Kepala / Plh) ditambahkan otomatis ke akhir form
+ *  SETIAP surat, jadi template baru tidak perlu menyebutnya di formFields.
+ *  Kecuali template yang memaksa penanda tangan sendiri lewat properti `ttd`.
+ * ------------------------------------------------------------------------- */
+window.KUA_TEMPLATES.forEach(function (t) {
+  if (t.ttd) return;
+  var ff = t.formFields || (t.formFields = []);
+  if (ff.indexOf('penandatangan') === -1) ff.push('#Penanda Tangan', 'penandatangan');
+});

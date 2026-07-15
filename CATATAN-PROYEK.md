@@ -51,7 +51,7 @@ Menambah surat baru = menambah **satu objek** di `KUA_TEMPLATES` (tidak menyentu
   kartu aktif bertanda centang). Pemicu menampilkan surat terpilih; klik di luar menutup menu.
   Dibangun otomatis dari `KUA_TEMPLATES` di `app.js`. Font UI web = **Inter**
   (dimuat dari Google Fonts; offline jatuh ke font sistem). Font PDF tetap Times (`surat.css`).
-- `config.js` → `KUA_CONFIG`: KOP (logo, baris instansi, alamat, kota) & blok tanda tangan.
+- `config.js` → `KUA_CONFIG`: KOP (logo, baris instansi, alamat, kota) & daftar penanda tangan.
   Ubah identitas kantor / penanda tangan cukup di sini, berlaku ke semua surat.
 - `templates.js` →
   - `KUA_FIELDS`: pustaka definisi input yang dipakai ulang antar-template.
@@ -90,7 +90,22 @@ Menambah surat baru = menambah **satu objek** di `KUA_TEMPLATES` (tidak menyentu
   - `titlecaseall` → semua kata kapital termasuk setelah koma. Dipakai: alamat.
   - Transform berjalan **real-time saat mengetik** (kursor dijaga).
 - `select` dengan `options:[...]`, opsional `otherValue` → memunculkan kolom teks "lainnya".
-  Dipakai: pekerjaan.
+  Dipakai: pekerjaan. Isi `options` boleh string (`'ASN'`) atau objek
+  (`{value:'plh', text:'Plh. Kepala KUA'}`) bila nilai tersimpan perlu beda dari teks tampilan.
+- `default: '<nilai>'` → mengisi nilai awal field (mis. `penandatangan` → `'kepala'`).
+
+## Penanda tangan (Kepala / Plh)
+Bila Kepala KUA cuti atau dinas luar, surat ditandatangani **Plh.**
+- Daftar penanda tangan ada di `config.js` → `KUA_CONFIG.penandatangan` (array).
+  Entri **pertama** (`kepala`) jadi default. Entri `plh` memakai jabatan
+  "Plh. Kepala Kantor Urusan Agama / Kecamatan Longkib".
+- **Bila Plh berganti orang:** cukup ubah `nama` & `nip` pada entri `plh` di `config.js`.
+- Di form, seksi **"Penanda Tangan"** dengan dropdown *Ditandatangani oleh* **ditambahkan
+  otomatis** ke akhir setiap surat (lihat bagian bawah `templates.js`) — template baru
+  tidak perlu menyebutnya di `formFields`. Nilai terpilih (id, mis. `plh`) dikirim lewat
+  URL, lalu `surat.js` merender blok tanda tangan yang sesuai.
+- Sebuah template masih bisa **memaksa** penanda tangan sendiri lewat properti `ttd`;
+  bila diisi, dropdown tidak ditambahkan ke form surat itu.
 
 ## Template yang sudah ada (4)
 1. `puskesmas-laki` — Pengantar Puskesmas, calon pengantin **laki-laki** (pemeriksaan kesehatan).

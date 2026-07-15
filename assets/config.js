@@ -20,10 +20,24 @@ window.KUA_CONFIG = {
     ]
   },
 
-  // Blok tanda tangan (penandatangan default)
-  ttd: {
-    jabatan: ['Kepala Kantor Urusan Agama', 'Kecamatan Longkib'],
-    nama: 'Apri Yudiansyah Siregar, S.H',
-    nip: 'NIP. 199606192022031003'
-  }
+  // Daftar penanda tangan. Entri PERTAMA dipakai sebagai default di form.
+  // Saat Kepala KUA cuti/dinas luar, staf memilih "Plh." pada dropdown
+  // "Ditandatangani oleh" — pilihan ini berlaku untuk semua jenis surat.
+  // Bila Plh berganti orang, cukup ubah nama & NIP pada entri 'plh' di bawah.
+  penandatangan: [
+    {
+      id: 'kepala',
+      label: 'Kepala KUA',
+      jabatan: ['Kepala Kantor Urusan Agama', 'Kecamatan Longkib'],
+      nama: 'Apri Yudiansyah Siregar, S.H',
+      nip: 'NIP. 199606192022031003'
+    },
+    {
+      id: 'plh',
+      label: 'Plh. Kepala KUA (Kepala cuti/dinas luar)',
+      jabatan: ['Plh. Kepala Kantor Urusan Agama', 'Kecamatan Longkib'],
+      nama: 'Fikri Mubarak Juli Armun Putra Rangkuti, S.Sos.I',
+      nip: 'NIP. 198807082022031001'
+    }
+  ]
 };
