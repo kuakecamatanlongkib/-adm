@@ -102,12 +102,14 @@
   }
 
   // --- Bangun field form dari template ---
-  function fieldHTML(key) {
+  function fieldHTML(key, tpl) {
     var def = FIELDS[key];
     if (!def) return '';
     var reqStar = def.required ? ' <span class="req">*</span>' : '';
     var attrs = 'id="f_' + key + '" data-key="' + key + '"';
-    if (def.placeholder) attrs += ' placeholder="' + def.placeholder + '"';
+    // Template boleh mengganti contoh isian, mis. format nomor surat keterangan/rekomendasi.
+    var placeholder = (tpl && tpl.placeholder && tpl.placeholder[key]) || def.placeholder;
+    if (placeholder) attrs += ' placeholder="' + placeholder + '"';
     if (def.inputmode) attrs += ' inputmode="' + def.inputmode + '"';
     if (def.maxlength) attrs += ' maxlength="' + def.maxlength + '"';
 
@@ -179,10 +181,10 @@
       var nextKey = keys[i + 1];
       var nextDef = (nextKey && nextKey.charAt(0) !== '#') ? FIELDS[nextKey] : null;
       if (def && def.half && nextDef && nextDef.half) {
-        html += '<div class="row-2">' + fieldHTML(key) + fieldHTML(nextKey) + '</div>';
+        html += '<div class="row-2">' + fieldHTML(key, tpl) + fieldHTML(nextKey, tpl) + '</div>';
         i += 2;
       } else {
-        html += fieldHTML(key);
+        html += fieldHTML(key, tpl);
         i += 1;
       }
     }

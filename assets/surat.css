@@ -1,9 +1,21 @@
-:root { --kop-line: #111; }
+/*
+ * Tampilan surat — mengikuti PMA Nomor 12 Tahun 2026 tentang Tata Naskah Dinas
+ * pada Kementerian Agama:
+ *  - huruf Arial 12;
+ *  - kop: Arial tebal 14 / 12 / 11, alamat-telepon Arial 9, satu garis di bawahnya;
+ *  - ruang tepi: kiri >= 3 cm, kanan >= 2 cm, bawah >= 2,5 cm; atas >= 2 cm pada
+ *    halaman tanpa kop (halaman ke-2 dst.);
+ *  - ruang tanda tangan >= 4 spasi; blok tanda tangan di kanan, tepi kanannya
+ *    +-3 cm dari tepi kertas, tepi kirinya mengikuti baris terpanjang;
+ *  - nomor halaman "- 2 -" di tengah atas mulai halaman ke-2.
+ * Formulir (.formulir, mis. Model N7) tetap memakai bentuk lamanya.
+ */
+:root { --kop-line: #000; }
 * { box-sizing: border-box; }
 html, body { margin: 0; padding: 0; }
 body {
   background: #525659;
-  font-family: "Times New Roman", Times, Georgia, serif;
+  font-family: Arial, "Liberation Sans", Helvetica, sans-serif;
   color: #000;
 }
 
@@ -23,107 +35,171 @@ body {
 .tb-back { background: #3a3f44; color: #fff; }
 .tb-back:hover { background: #4a5057; }
 
-/* Halaman A4 */
+/* Halaman A4 (pratinjau layar: ruang tepi sama dengan hasil cetak halaman pertama) */
 .page {
   background: #fff; width: 210mm; min-height: 297mm;
-  margin: 18px auto; padding: 22mm 22mm 20mm 25mm;
+  margin: 18px auto; padding: 12mm 20mm 25mm 30mm;
   box-shadow: 0 4px 24px rgba(0,0,0,0.35);
   font-size: 12pt; line-height: 1.15; text-align: justify;
 }
+.page.kecil { font-size: 11pt; }   /* formulir panjang (mis. ikrar taukil wali) */
 
-/* KOP — 3 kolom: [logo] [teks tengah] [ruang penyeimbang] */
-.kop { display: flex; align-items: center; gap: 10px; text-align: center; padding-bottom: 0; }
-.kop .logo-slot { flex: 0 0 96px; }
-.kop .logo { width: 100%; height: 96px; object-fit: contain; }
+/* KOP — logo di kiri, teks di tengah, satu garis di bawah */
+.kop { display: flex; align-items: center; gap: 8px; text-align: center; }
+.kop .logo-slot { flex: 0 0 80px; }
+.kop .logo { display: block; width: 100%; height: 80px; object-fit: contain; }
 .kop .kop-text { flex: 1 1 auto; min-width: 0; }
-.kop .h1, .kop .h2, .kop .h3 { margin: 0; line-height: 1; font-weight: bold; }
-.kop .h1 { font-size: 14pt; letter-spacing: 0.3px; }
-.kop .h2 { font-size: 13pt; }
-.kop .h3 { font-size: 15pt; }
-.kop .alamat { font-size: 10.5pt; margin-top: 2px; line-height: 1.15; font-family: Arial, Helvetica, sans-serif; }
-.kop-rule { border: none; border-top: 3px solid var(--kop-line); margin: 1px 0 1px; }
-.kop-rule.thin { border-top: 1px solid var(--kop-line); margin: 0 0 14px; }
+.kop .h1, .kop .h2, .kop .h3 { margin: 0; line-height: 1.15; font-weight: bold; }
+.kop .h1 { font-size: 14pt; }
+.kop .h2 { font-size: 12pt; }
+.kop .h3 { font-size: 11pt; }
+.kop .alamat { font-size: 9pt; margin-top: 2px; line-height: 1.2; }
+/* "2 (dua) spasi di bawah kop" */
+.kop-rule { border: none; border-top: 2px solid var(--kop-line); margin: 4px 0 2.3em; }
 
-/* Tata letak formulir (mis. Model N7): kop tengah tanpa logo & tanpa garis */
+/* Judul naskah berjudul (surat keterangan, rekomendasi, ikrar) */
+.judul { text-align: center; margin: 0 0 1.15em; }
+.judul-jenis { font-weight: bold; text-transform: uppercase; }
+.judul-sub { text-transform: uppercase; }
+
+/* Meta surat dinas: Nomor/Sifat/Lampiran/Hal kiri, tempat-tanggal kanan sebaris Nomor */
+table.nomor { border-collapse: collapse; text-align: left; }
+table.meta-dinas { width: 100%; }
+table.meta-dinas td.tgl { width: 1%; white-space: nowrap; text-align: right; padding-left: 16px; }
+table.nomor td { vertical-align: top; padding: 0; }
+table.nomor td.label { width: 78px; }
+table.nomor td.sep { width: 14px; text-align: center; }
+
+/* Yth. + nama jabatan; baris "di ..." sejajar di bawahnya */
+.yth { display: flex; gap: 0.4em; margin: 1.15em 0; text-align: left; }
+.yth-label { flex: 0 0 auto; }
+
+/* Dasar / Menimbang */
+table.konsiderans { border-collapse: collapse; width: 100%; margin: 0 0 0.6em; }
+table.konsiderans td { vertical-align: top; padding: 0; }
+table.konsiderans td.label { width: 96px; }
+table.konsiderans td.sep { width: 14px; }
+ol.butir { margin: 0; padding-left: 1.6em; }
+ol.butir li { padding: 0 0 2px; }
+
+/* Isi surat */
+.tujuan { margin: 14px 0; }
+.salam { margin: 14px 0; }
+.pembuka { margin: 0 0 6px; }
+.indent, .isi, .penutup { text-indent: 1.27cm; }   /* alinea menjorok (contoh PMA) */
+
+table.data { border-collapse: collapse; margin: 3px 0; text-align: left; }
+table.data td { vertical-align: top; padding: 1px 0; }
+table.data td.label { width: 190px; }
+table.data td.sep { width: 16px; }
+.data-head { font-weight: bold; margin: 8px 0 2px; }
+.data-text { margin: 8px 0 3px; }
+.data-gap { height: 8px; }
+
+.isi { margin: 10px 0; }
+.isi.tanpa-indent { text-indent: 0; }
+.isi.ikrar { text-indent: 0; margin: 8px 0.8cm; }
+.penutup { margin: 10px 0 0; }
+
+/* Tanda tangan */
+.ttd {
+  margin-top: 1.15em; display: flex; justify-content: flex-end; padding-right: 10mm;
+  break-inside: avoid; page-break-inside: avoid;
+}
+.ttd .block { text-align: left; }
+.ttd .space { height: 4.6em; }          /* >= 4 spasi */
+
+/* Tanda tangan ganda (ikrar taukil wali): dua kolom. Bagian kepala tiap kolom
+   setinggi 3 baris agar nama kedua penanda tangan sejajar. */
+.ttd-grid {
+  display: grid; grid-template-columns: 1fr 1fr; column-gap: 14mm;
+  margin-top: 1.15em; text-align: left; break-inside: avoid; page-break-inside: avoid;
+}
+.ttd-cell { text-align: left; }
+.ttd-head { min-height: 3.45em; }
+.ttd-cell .space { height: 4.6em; }            /* >= 4 spasi (pejabat) */
+.ttd-grid.saksi .space { height: 3.45em; }     /* ruang tanda tangan saksi */
+.ttd-cell .meterai-slot { display: flex; align-items: center; }
+.meterai {
+  display: inline-block; border: 1px dashed #888; color: #777;
+  font-size: 8pt; line-height: 1.2; padding: 5px 7px; text-align: center;
+}
+.saksi-judul { font-weight: bold; }
+table.data.saksi-data { margin: 2px 0 6px; }
+table.data.saksi-data td.label { width: 58px; }
+
+/* Mode ringkas untuk surat panjang agar muat 1 halaman. Ruang tanda tangan
+   tetap >= 4 spasi dan ruang tepi tetap sesuai PMA. */
+.page.compact .kop-rule { margin-bottom: 1.15em; }
+.page.compact .judul { margin-bottom: 0.7em; }
+.page.compact .yth { margin: 0.7em 0; }
+.page.compact .pembuka { margin: 0 0 3px; }
+.page.compact .isi { margin: 6px 0; }
+.page.compact .isi.ikrar { margin: 5px 0.8cm; }
+.page.compact .penutup { margin: 6px 0 0; }
+.page.compact table.data { margin: 1px 0; }
+.page.compact table.data td { padding: 0; }
+.page.compact .data-head { margin: 5px 0 1px; }
+.page.compact .data-text { margin: 5px 0 2px; }
+.page.compact .data-gap { height: 5px; }
+.page.compact .ttd, .page.compact .ttd-grid { margin-top: 0.7em; }
+.page.compact.kecil .kop-rule { margin-bottom: 0.8em; }
+.page.compact.kecil table.data { line-height: 1.08; }
+.page.compact.kecil .isi { margin: 4px 0; }
+.page.compact.kecil .isi.ikrar { margin: 3px 0.8cm; }
+.page.compact.kecil .ttd-grid { margin-top: 0.5em; }
+.page.compact.kecil .ttd-grid.saksi .space { height: 3em; }
+.page.compact.kecil table.data.saksi-data { margin: 1px 0 2px; }
+
+/* ---------- Formulir (Model N7): bentuk lama, tidak mengikuti tata letak PMA ---------- */
+.page.formulir { font-family: "Times New Roman", Times, Georgia, serif; padding: 22mm 22mm 20mm 25mm; }
 .lampiran-ref { text-align: left; margin-bottom: 16px; }
 .form-title { text-align: center; font-weight: bold; text-transform: uppercase; margin: 0; }
 .model-kode { text-align: right; margin: 0 0 12px; }
 .kop-plain { text-align: center; font-weight: bold; margin-bottom: 18px; }
 .kop-plain div { line-height: 1.25; }
-
-/* Blok pilihan berkotak centang (□) + daftar syarat bernomor */
+.page.formulir .meta { margin-bottom: 14px; }
+.page.formulir .meta .tgl { text-align: right; margin-bottom: 10px; }
+.page.formulir table.nomor td.label { width: 70px; }
+.page.formulir .isi, .page.formulir .penutup { text-indent: 0; }
+.page.formulir .ttd { display: block; margin-top: 18px; padding-right: 0; }
+.page.formulir .ttd .block { width: 48%; margin-left: auto; }
+.page.formulir .ttd .space { height: 70px; }
+.nama-lama { font-weight: bold; text-decoration: underline; }
+.ttd .wassalam { margin-bottom: 2px; }
 .check-block { margin: 10px 0; }
 .check-head { display: flex; gap: 8px; align-items: baseline; }
 .check-head .check-box { flex: 0 0 auto; font-size: 13pt; }
 ol.syarat { margin: 4px 0 4px 0; padding-left: 46px; }
 ol.syarat li { padding: 1px 0; text-align: justify; }
-.ttd .wassalam { margin-bottom: 2px; }
-
-/* Judul di tengah + nomor di bawahnya (surat keterangan) */
-.judul-surat {
-  text-align: center; font-weight: bold; text-transform: uppercase;
-  text-decoration: underline; margin: 4px 0 1px;
-}
-.judul-nomor { text-align: center; margin-bottom: 16px; }
-
-/* Isi surat */
-.meta { margin-bottom: 14px; }
-.meta .tgl { text-align: right; margin-bottom: 10px; }
-table.nomor { border-collapse: collapse; }
-table.nomor td { vertical-align: top; padding: 0; }
-table.nomor td.label { width: 70px; }
-table.nomor td.sep { width: 14px; text-align: center; }
-
-.tujuan { margin: 14px 0; }
-.salam { margin: 14px 0; }
-.pembuka { margin: 0 0 8px; }
-
-table.data { border-collapse: collapse; margin: 4px 0 4px 8px; }
-table.data td { vertical-align: top; padding: 1px 0; }
-table.data td.label { width: 190px; }
-table.data td.sep { width: 16px; }
-.data-head { font-weight: bold; margin: 8px 0 2px 8px; }
-.data-text { margin: 10px 0 2px; }
-.data-gap { height: 8px; }
-
-.isi { margin: 12px 0; text-align: justify; }
-.penutup { margin: 12px 0 0; }
-
-/* Tanda tangan */
-.ttd { margin-top: 18px; width: 100%; break-inside: avoid; page-break-inside: avoid; }
-.ttd .block { width: 48%; margin-left: auto; text-align: left; }
-.ttd .space { height: 70px; }
-.ttd .nama { font-weight: bold; text-decoration: underline; }
-
-/* Mode ringkas untuk surat panjang (mis. dispensasi nikah) agar muat 1 halaman */
-.page.compact .meta { margin-bottom: 8px; }
-.page.compact .meta .tgl { margin-bottom: 6px; }
-.page.compact .tujuan,
-.page.compact .salam { margin: 8px 0; }
-.page.compact .pembuka { margin: 0 0 4px; }
-.page.compact .isi { margin: 7px 0; }
-.page.compact .penutup { margin: 8px 0 0; }
-.page.compact table.data { margin: 2px 0 2px 8px; }
-.page.compact .data-head { margin: 5px 0 1px 8px; }
-.page.compact .data-gap { height: 5px; }
-.page.compact .ttd { margin-top: 8px; }
-.page.compact .ttd .space { height: 38px; }
 
 @media print {
-  @page { size: A4; margin: 0; }
+  /* Ruang tepi lewat @page agar berlaku di setiap halaman (surat 2 halaman). */
+  @page {
+    size: A4; margin: 20mm 20mm 25mm 30mm;
+    @top-center { content: "- " counter(page) " -"; font-family: Arial, sans-serif; font-size: 12pt; }
+  }
+  @page :first {
+    margin-top: 12mm;
+    @top-center { content: none; }
+  }
+  @page formulir {
+    margin: 18mm 22mm 18mm 25mm;
+    @top-center { content: none; }
+  }
   body { background: #fff; }
   .toolbar { display: none !important; }
-  .page {
-    width: auto; min-height: auto; margin: 0; box-shadow: none;
-    padding: 18mm 22mm 18mm 25mm;
-  }
-  .page.compact { padding: 13mm 22mm 12mm 25mm; }
+  .page { width: auto; min-height: auto; margin: 0; padding: 0; box-shadow: none; }
+  .page.formulir { page: formulir; padding: 0; }
 }
 
 /* Tampilan ponsel: muat lebar layar */
 @media screen and (max-width: 820px) {
-  .page { width: 100%; padding: 16px; margin: 0 auto; font-size: 11pt; }
-  .kop .logo-slot { flex-basis: 64px; }
-  .kop .logo { height: 64px; }
-  table.data td.label { width: 150px; }
+  .page, .page.formulir { width: 100%; padding: 16px; margin: 0 auto; font-size: 11pt; }
+  .kop .logo-slot { flex-basis: 56px; }
+  .kop .logo { height: 56px; }
+  table.data td.label { width: 140px; }
+  table.meta-dinas td.tgl { white-space: normal; }
+  .ttd { padding-right: 0; }
+  .ttd-grid { column-gap: 16px; }
 }

@@ -50,7 +50,8 @@ Menambah surat baru = menambah **satu objek** di `KUA_TEMPLATES` (tidak menyentu
   **kartu** dikelompokkan per kategori (judul kategori + badge jumlah + kartu nama/deskripsi,
   kartu aktif bertanda centang). Pemicu menampilkan surat terpilih; klik di luar menutup menu.
   Dibangun otomatis dari `KUA_TEMPLATES` di `app.js`. Font UI web = **Inter**
-  (dimuat dari Google Fonts; offline jatuh ke font sistem). Font PDF tetap Times (`surat.css`).
+  (dimuat dari Google Fonts; offline jatuh ke font sistem). Font surat/PDF = **Arial** sesuai
+  PMA 12/2026 (`surat.css`); formulir N7 tetap Times.
 - `config.js` → `KUA_CONFIG`: KOP (logo, baris instansi, alamat, kota) & daftar penanda tangan.
   Ubah identitas kantor / penanda tangan cukup di sini, berlaku ke semua surat.
 - `templates.js` →
@@ -94,11 +95,42 @@ Menambah surat baru = menambah **satu objek** di `KUA_TEMPLATES` (tidak menyentu
   (`{value:'plh', text:'Plh. Kepala KUA'}`) bila nilai tersimpan perlu beda dari teks tampilan.
 - `default: '<nilai>'` → mengisi nilai awal field (mis. `penandatangan` → `'kepala'`).
 
+## Aturan tata naskah dinas: PMA Nomor 12 Tahun 2026
+Sejak November 2026 tampilan surat mengikuti **PMA Nomor 12 Tahun 2026 tentang Tata Naskah
+Dinas pada Kementerian Agama** (berlaku 13 Juli 2026, menggantikan KMA 9/2016; masa
+penyesuaian 2 tahun, Pasal 15). Ringkasan yang diterapkan:
+- **Huruf Arial 12** (`surat.css`). Kop: Arial tebal 14 / 12 / 11, alamat-telepon Arial 9,
+  logo di kiri, **satu garis** di bawah kop.
+- **Ruang tepi:** kiri ≥ 3 cm, kanan ≥ 2 cm, bawah ≥ 2,5 cm; halaman ke-2 dst. atas ≥ 2 cm
+  dan bernomor "- 2 -" di tengah atas (lewat `@page`).
+- **Tanda tangan:** nama jabatan diakhiri koma; nama lengkap huruf awal kapital **tanpa gelar**,
+  tidak tebal/bergaris bawah; ruang tanda tangan ≥ 4 spasi; blok di kanan, tepi kanannya ±3 cm
+  dari tepi kertas.
+- **NIP di bawah nama** hanya untuk Plh (`nipDiTtd: true` di `config.js`) — contoh surat dinas,
+  surat keterangan, dan rekomendasi di PMA tidak mencantumkan NIP, sedangkan contoh tanda tangan
+  Plh mencantumkan "NIP: ...".
+- **Surat dinas** (Puskesmas, Dispensasi): Nomor/Sifat/Lampiran/Hal di kiri, tempat-tanggal di
+  kanan sebaris Nomor, "Yth." + "di Tempat", alinea pembuka diawali "Dengan hormat,", alinea
+  menjorok 1,27 cm.
+- **Surat keterangan / rekomendasi:** "SURAT KETERANGAN" / "REKOMENDASI" tebal, judul kapital di
+  bawahnya, lalu "NOMOR: ..."; tempat-tanggal di atas jabatan penanda tangan.
+  Penutup baku: "Demikian surat keterangan ini dibuat untuk digunakan sebagaimana mestinya." /
+  "Demikian rekomendasi ini dibuat untuk dipergunakan seperlunya."
+- **Format nomor** (diketik manual oleh staf; contoh di form sudah format baru):
+  surat dinas `B/123/[kode jabatan]/[klasifikasi]/11/2026`, surat keterangan
+  `12/[kode jabatan]/[klasifikasi]/SKet/11/2026`, rekomendasi `.../Rek/...`.
+  > Kode jabatan KUA ditetapkan Kepala Kankemenag Kota, dan menurut PMA kode wilayahnya mengacu
+  > ke kode wilayah administrasi pemerintahan (Longkib = 11.75.05). Kode `KUA.01.23.05` yang
+  > dipakai sekarang mungkin berubah — konfirmasi ke TU Kankemenag, lalu perbarui `placeholder`.
+- **Formulir N7** tidak mengikuti tata letak PMA (bentuknya dari Kepdirjen Bimas Islam 473/2020):
+  tetap Times, kop polos, nama tebal bergaris bawah + NIP (`.page.formulir`).
+
 ## Penanda tangan (Kepala / Plh)
 Bila Kepala KUA cuti atau dinas luar, surat ditandatangani **Plh.**
 - Daftar penanda tangan ada di `config.js` → `KUA_CONFIG.penandatangan` (array).
   Entri **pertama** (`kepala`) jadi default. Entri `plh` memakai jabatan
   "Plh. Kepala Kantor Urusan Agama / Kecamatan Longkib".
+- `nama` ditulis **tanpa gelar**; `nip` berisi angka saja (label "NIP" ditambahkan otomatis).
 - **Bila Plh berganti orang:** cukup ubah `nama` & `nip` pada entri `plh` di `config.js`.
 - Di form, seksi **"Penanda Tangan"** dengan dropdown *Ditandatangani oleh* **ditambahkan
   otomatis** ke akhir setiap surat (lihat bagian bawah `templates.js`) — template baru
@@ -107,11 +139,11 @@ Bila Kepala KUA cuti atau dinas luar, surat ditandatangani **Plh.**
 - Sebuah template masih bisa **memaksa** penanda tangan sendiri lewat properti `ttd`;
   bila diisi, dropdown tidak ditambahkan ke form surat itu.
 
-## Template yang sudah ada (5)
+## Template yang sudah ada (8)
 1. `puskesmas-laki` — Pengantar Puskesmas, calon pengantin **laki-laki** (pemeriksaan kesehatan).
 2. `puskesmas-perempuan` — Pengantar Puskesmas, calon pengantin **perempuan** (imunisasi TT & cek kehamilan).
 3. `dispensasi-nikah` — Permohonan **Dispensasi Nikah** ke Camat (2 orang: calon suami & istri,
-   rencana akad, 2 paragraf isi). Pakai `compact: true` agar muat 1 halaman.
+   rencana akad, 2 paragraf isi).
 4. `n7-penolakan-kehendak` — **Formulir Model N7** (pemberitahuan/penolakan kehendak nikah/rujuk).
    Pakai tata letak formulir (`formLayout`): kop tengah tanpa logo & tanpa garis, ada `lampiranRef`,
    `judulFormulir`, `modelKode`, `kopBaris`, `tanggalTanpaKota`. Dua blok pilihan berkotak centang
@@ -130,6 +162,27 @@ Bila Kepala KUA cuti atau dinas luar, surat ditandatangani **Plh.**
    > Kota pada tanda tangan mengikuti `config.js` (**Longkib**), bukan "Subulussalam" seperti
    > pada surat contoh, supaya konsisten dengan surat lain.
 
+6. `keterangan-memeluk-islam` — **Surat Keterangan Memeluk Agama Islam** (dari contoh
+   `SURAT Pernyataan memeluk agama islam.docx`; isinya keterangan dari Kepala KUA, jadi berbentuk
+   Surat Keterangan). Data yang bersangkutan (+ NIK, jenis kelamin, agama sebelumnya), lalu
+   "Berdasarkan data yang diterima Kantor Urusan Agama Kecamatan Longkib, ..." + Hari/Tanggal
+   (hari dihitung otomatis — contoh lama salah menulis "Jum'at 13 Agustus 2026", padahal Kamis),
+   Tempat, **Dibimbing oleh**, Saksi-saksi (field `list`, dinomori otomatis).
+7. `ikrar-taukil-wali` — **Surat Ikrar Taukil Wali** (dari `SURAT WAKILAH.docx`). Wali nasab yang
+   berhalangan hadir mewakilkan akad kepada KUA tempat akad. `hubunganWali` (dropdown: ayah,
+   kakek, saudara, keponakan, paman, sepupu) mengubah frasa "adalah wali nasab (...)" dan sebutan
+   di ikrar ("anak perempuan saya", "cucu perempuan saya", dst. — lihat `HUBUNGAN_WALI`).
+   Mahar teks bebas + `pembayaranMahar` (Dibayar Tunai/Terutang). Tanda tangan khusus lewat
+   `ttdHTML`: [Mengetahui Kepala KUA | Wali + kotak Meterai Rp10.000], lalu [Saksi I | Saksi II].
+   Bukan naskah dinas KUA, jadi memakai `hurufKecil` (11 pt) + `compact` agar muat 1 halaman.
+8. `rekomendasi-simas` — **Rekomendasi Bantuan Masjid (SIMAS)** (dari `Surat Rekomendasi SIMAS.pdf`).
+   Bentuk Rekomendasi PMA: **Dasar** (field `list` opsional — tidak tampil bila kosong) dan
+   **Menimbang** (disusun otomatis: masjid terdaftar di SIMAS + berada di wilayah kerja KUA),
+   identitas pemberi, "Dengan ini memberikan rekomendasi kepada:", paragraf "Untuk ...".
+   > Nomor juknis bantuan masjid 2026 tidak dipublikasikan daring (yang ditemukan hanya juknis
+   > lama, mis. Kepdirjen Bimas Islam 224/2022). Bila juknis 2026 sudah didapat, isi kolom Dasar,
+   > atau jadikan isi tetap di fungsi `items` pada `konsiderans` template ini.
+
 ### Properti khusus tata letak formulir (dipakai N7)
 - `formLayout: true` → kop teks rata tengah tanpa logo/garis (bukan kop 3 kolom standar).
 - `lampiranRef: [...]` → teks kecil kiri atas (mis. "Lampiran XI" / dasar hukum).
@@ -141,13 +194,27 @@ Bila Kepala KUA cuti atau dinas luar, surat ditandatangani **Plh.**
 - `wassalam: true` → tampilkan "Wassalam," di atas blok tanda tangan.
 - `tujuan`/`pembuka` kini boleh berisi **fungsi** `function(d)` untuk baris/paragraf dinamis.
 
-### Properti khusus surat keterangan (dipakai BIMWIN)
-- `judulSurat: '...'` → judul tebal bergaris bawah di tengah, dengan "Nomor : ..." di bawahnya.
-  Bila dipakai, nomor **tidak** lagi tampil sebagai baris meta di kiri atas.
-- `tanggalDiTtd: true` → tanggal tidak muncul di kanan atas, melainkan di atas jabatan pada
-  blok tanda tangan.
-- `letterRows` menerima `{ text: '...' | function(d) }` → kalimat biasa (tidak tebal) di antara
-  dua tabel data, mis. "Menerangkan dengan sesungguhnya bahwa calon suami :".
+### Properti surat dinas (Puskesmas, Dispensasi)
+- `hal` → baris "Hal"; `sifat` (bawaan "Biasa") dan `lampiran` (bawaan "-") boleh diisi.
+- `yth: ['Camat Longkib', 'di Tempat']` → blok "Yth." (bentuk lama `tujuan` hanya dipakai N7).
+
+### Properti naskah berjudul (surat keterangan, rekomendasi, ikrar)
+- `jenisNaskah: 'Surat Keterangan'` → baris tebal kapital di tengah; `judulSurat` (string/fungsi)
+  → baris judul kapital di bawahnya; lalu "NOMOR: ...". Nomor tidak tampil di kiri atas.
+- `tanggalDiTtd: true` → tempat-tanggal di atas jabatan pada blok tanda tangan.
+- `konsiderans: [{label, items(d), gaya:'huruf'}]` → blok "Dasar :" / "Menimbang :" bernomor
+  1. 2. / a. b.; butir kosong dibuang, tanda baca akhir dirapikan (";" lalu ".").
+- `letterRows` menerima `{ text: '...' | function(d), indent: true }` → kalimat biasa di antara
+  dua tabel data (mis. "dengan ini menerangkan bahwa:"); `indent` = alinea menjorok.
+- Konstanta `BARIS_PENANDA_TANGAN` (Nama/NIP/Jabatan, ikut Kepala/Plh) dipakai ulang.
+
+### Properti lain
+- `isi` boleh berisi objek `{ text, cls }`: `cls: 'tanpa-indent'` (lanjutan kalimat setelah tabel,
+  paragraf "Untuk ..."), `cls: 'ikrar'` (blok kutipan menjorok kiri-kanan). `penutup` boleh fungsi.
+- `ttdHTML: function(d, h)` → tata letak tanda tangan khusus; `h` berisi `esc`, `tabel(rows, cls)`,
+  `tglTeks`, `ttd`, `jabatanHTML(ttd)`, `namaHTML(ttd)`. Dipakai taukil wali.
+- `hurufKecil: true` → huruf 11 pt (hanya untuk formulir non-naskah-dinas yang panjang).
+- `placeholder: { nomor: '...' }` → contoh isian per template (mis. format nomor SKet/Rek).
 
 ### Helper di `util.js`
 - `KUAUtil.tglIndo(iso)` → "8 Juni 2026"; `KUAUtil.hariIndo(iso)` → "Senin".
@@ -163,22 +230,25 @@ Bila Kepala KUA cuti atau dinas luar, surat ditandatangani **Plh.**
 4. Tes (lihat di bawah), lalu commit & push.
 
 ## Tampilan surat & cetak (`surat.css`)
-- Halaman A4, kop 3 kolom (logo kiri, teks tengah, penyeimbang), garis tebal-tipis.
-- Tanggal **rata kanan**, badan surat **rata kanan-kiri (justify)**, **spasi baris 1.15**.
-- Blok tanda tangan agak ke kanan, `break-inside: avoid` agar tidak terbelah antar-halaman.
-- **Mode `compact`** (`.page.compact`): margin & ruang tanda tangan diperkecil khusus surat
-  panjang; line spacing tetap 1.15.
+- Halaman A4, Arial 12, kop PMA (logo kiri, teks tengah, satu garis). Ruang tepi lewat `@page`
+  agar berlaku di setiap halaman; halaman pertama atas 12 mm.
+- Badan surat **rata kanan-kiri (justify)**, **spasi baris 1.15**, alinea menjorok 1,27 cm.
+- Blok tanda tangan di kanan, `break-inside: avoid` agar tidak terbelah antar-halaman.
+- **Mode `compact`** (`.page.compact`): jarak antar-bagian diringkas untuk surat panjang;
+  ruang tepi & ruang tanda tangan tetap sesuai PMA.
 
 ## Cara tes hasil ke PDF (verifikasi cepat)
 Render `surat.html` dengan data contoh memakai Chrome headless (Windows PowerShell):
 ```powershell
 $chrome = "C:\Program Files\Google\Chrome\Application\chrome.exe"
 $prof = Join-Path $env:TEMP ("kuaP" + [guid]::NewGuid().ToString("N"))
-$url = "file:///D:/Projects/kua-longkib/surat.html?__t=puskesmas-laki&nomor=B-123&tanggal=2026-06-12&nama=Budi+Santoso&nik=1207230807880002&tempatLahir=Subulussalam&tanggalLahir=1988-08-07&pekerjaan=ASN&alamat=Subulussalam"
-& $chrome --headless=new --disable-gpu --no-first-run --user-data-dir=$prof `
-  --virtual-time-budget=3000 --run-all-compositor-stages-before-draw `
-  --no-pdf-header-footer --print-to-pdf="D:\Projects\kua-longkib\__tes.pdf" $url
+$url = "file:///D:/Projects/kua-longkib/surat.html?__t=puskesmas-laki&nomor=B/123&tanggal=2026-06-12&nama=Budi+Santoso&nik=1207230807880002&tempatLahir=Subulussalam&tanggalLahir=1988-08-07&pekerjaan=ASN&alamat=Subulussalam"
+Start-Process -FilePath $chrome -Wait -NoNewWindow -ArgumentList @('--headless', '--disable-gpu',
+  '--no-first-run', "--user-data-dir=$prof", '--no-pdf-header-footer',
+  '--print-to-pdf=D:\Projects\kua-longkib\__tes.pdf', $url)
 ```
+> **Jangan** pakai `--virtual-time-budget`: dengan flag itu `window.print()` otomatis di
+> halaman surat ikut terpicu dan membatalkan cetak headless (Chrome 157 — PDF tidak terbentuk).
 File uji berpola `__*.pdf`, `__*.png`, `cek-*.pdf`, `contoh-*.pdf` di-*ignore* oleh `.gitignore`.
 
 ## Deploy (update situs live)
