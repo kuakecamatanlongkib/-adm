@@ -1,5 +1,5 @@
 /*
- * Datepicker custom — tampilan dd/mm/yyyy, popup kalender dengan dropdown
+ * Datepicker custom: tampilan dd/mm/yyyy, popup kalender dengan dropdown
  * Bulan & Tahun. Nilai DISIMPAN dalam format ISO (yyyy-mm-dd) di input hidden,
  * sehingga sisa aplikasi (mis. tglIndo) tidak perlu berubah.
  *
@@ -13,6 +13,12 @@
   var BULAN = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli',
                'Agustus', 'September', 'Oktober', 'November', 'Desember'];
   var DOW = ['Mg', 'Sn', 'Sl', 'Rb', 'Km', 'Jm', 'Sb'];
+  function ikon(path) {
+    return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" ' +
+      'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + path + '</svg>';
+  }
+  var IKON_KIRI = ikon('<path d="m15 18-6-6 6-6"/>');
+  var IKON_KANAN = ikon('<path d="m9 18 6-6-6-6"/>');
 
   function pad(n) { return String(n).padStart(2, '0'); }
 
@@ -72,8 +78,8 @@
     // Delegasi event di dalam popup
     this.pop.addEventListener('click', function (e) {
       var t = e.target;
-      if (t.classList.contains('dp-prev')) { self.move(-1); }
-      else if (t.classList.contains('dp-next')) { self.move(1); }
+      if (t.closest('.dp-prev')) { self.move(-1); }
+      else if (t.closest('.dp-next')) { self.move(1); }
       else if (t.classList.contains('day') && t.dataset.day) { self.pick(+t.dataset.day); }
       else if (t.classList.contains('dp-today')) { self.setDate(new Date()); }
       else if (t.classList.contains('dp-clear')) { self.clear(); }
@@ -93,6 +99,28 @@
     if (sel) { this.viewYear = sel.getFullYear(); this.viewMonth = sel.getMonth(); }
     this.render();
     this.pop.style.display = 'block';
+    this.place();
+  };
+
+  // Tepi kanan area yang memotong isi (panel form yang bergulir, atau layar).
+  function batasKanan(el) {
+    for (var p = el.parentElement; p && p !== document.body; p = p.parentElement) {
+      if (window.getComputedStyle(p).overflowX !== 'visible') {
+        return p.getBoundingClientRect().left + p.clientLeft + p.clientWidth;
+      }
+    }
+    return document.documentElement.clientWidth;
+  }
+
+  // Kalender tidak boleh menjorok keluar panel (itu yang memunculkan gulir horizontal).
+  // Bila kolom tanggal ada di sisi kanan, kalender dibuka rata kanan dengan kolomnya.
+  DatePicker.prototype.place = function () {
+    this.pop.classList.remove('dp-kanan');
+    // Pakai offset* (tidak terpengaruh skala animasi muncul), bukan getBoundingClientRect popup.
+    var kanan = this.wrap.getBoundingClientRect().left + this.pop.offsetLeft + this.pop.offsetWidth;
+    if (kanan > batasKanan(this.wrap) - 8) {
+      this.pop.classList.add('dp-kanan');
+    }
   };
   DatePicker.prototype.hide = function () {
     this.pop.style.display = 'none';
@@ -122,6 +150,7 @@
     this.selected = null;
     this.hidden.value = '';
     this.syncDisplay();
+    this.hidden.dispatchEvent(new Event('change', { bubbles: true }));   // pratinjau ikut diperbarui
     this.hide();
   };
 
@@ -141,12 +170,12 @@
 
     var head =
       '<div class="dp-head">' +
-        '<button type="button" class="dp-nav dp-prev" aria-label="Bulan sebelumnya">‹</button>' +
+        '<button type="button" class="dp-nav dp-prev" aria-label="Bulan sebelumnya">' + IKON_KIRI + '</button>' +
         '<div class="dp-sel">' +
           '<select class="dp-month" aria-label="Bulan">' + monthOpts + '</select>' +
           '<select class="dp-year" aria-label="Tahun">' + yearOpts + '</select>' +
         '</div>' +
-        '<button type="button" class="dp-nav dp-next" aria-label="Bulan berikutnya">›</button>' +
+        '<button type="button" class="dp-nav dp-next" aria-label="Bulan berikutnya">' + IKON_KANAN + '</button>' +
       '</div>';
 
     var grid = '<div class="dp-grid">';

@@ -31,9 +31,10 @@ window.KUA_CONFIG = {
   // Aturan PMA 12/2026:
   //  - nama ditulis huruf awal kapital TANPA gelar;
   //  - nip ditulis angka saja (label "NIP" ditambahkan otomatis);
-  //  - nipDiTtd: true -> NIP tampil di bawah nama pada blok tanda tangan. Contoh
-  //    surat dinas / surat keterangan / rekomendasi di PMA tidak mencantumkan NIP,
-  //    sedangkan contoh tanda tangan Plh mencantumkannya ("NIP: ...").
+  //  - Blok tanda tangan TIDAK memuat NIP, baik Kepala maupun Plh (keputusan pemilik,
+  //    16-11-2026). Bila suatu saat perlu, tambahkan `nipDiTtd: true` pada entri itu
+  //    -> "NIP: ..." tampil di bawah nama. Formulir N7 tetap memuat NIP (bentuk formulirnya).
+  //  - nip tetap diisi: dipakai baris "NIP" di badan surat keterangan/rekomendasi.
   penandatangan: [
     {
       id: 'kepala',
@@ -47,8 +48,7 @@ window.KUA_CONFIG = {
       label: 'Plh. Kepala KUA (Kepala cuti/dinas luar)',
       jabatan: ['Plh. Kepala Kantor Urusan Agama', 'Kecamatan Longkib'],
       nama: 'Fikri Mubarak Juli Armun Putra Rangkuti',
-      nip: '198807082022031001',
-      nipDiTtd: true
+      nip: '198807082022031001'
     }
   ]
 };

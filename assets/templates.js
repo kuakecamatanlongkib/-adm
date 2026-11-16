@@ -229,7 +229,7 @@ window.KUA_FIELDS = {
     options: ['Rehabilitasi', 'Pembangunan'], default: 'Rehabilitasi'
   },
   dasarRekomendasi: {
-    label: 'Dasar (opsional — kosongkan bila tidak ada)', type: 'list', addLabel: '+ Tambah dasar',
+    label: 'Dasar',   // tidak wajib -> form menambahkan "(opsional)" otomatis type: 'list', addLabel: '+ Tambah dasar',
     placeholder: 'contoh: Keputusan Direktur Jenderal Bimbingan Masyarakat Islam Nomor ... Tahun 2026 tentang ...'
   },
 
@@ -299,7 +299,7 @@ function kuaAkadBersih(d) { return String(d.kuaAkad || '').replace(/^\s*(KUA\s+)
 window.KUA_TEMPLATES = [
   {
     id: 'puskesmas-laki',
-    nama: 'Pengantar Puskesmas — Calon Pengantin Laki-laki',
+    nama: 'Pengantar Puskesmas Calon Pengantin Laki-laki',
     kategori: 'Pengantar Puskesmas',
     deskripsi: 'Permohonan pemeriksaan kesehatan & Surat Keterangan Sehat.',
     hal: 'Permohonan Pemeriksaan Kesehatan Calon Pengantin',
@@ -313,7 +313,7 @@ window.KUA_TEMPLATES = [
   },
   {
     id: 'puskesmas-perempuan',
-    nama: 'Pengantar Puskesmas — Calon Pengantin Perempuan',
+    nama: 'Pengantar Puskesmas Calon Pengantin Perempuan',
     kategori: 'Pengantar Puskesmas',
     deskripsi: 'Permohonan imunisasi TT & pemeriksaan kehamilan.',
     hal: 'Permohonan Imunisasi TT dan Pemeriksaan Kehamilan Calon Pengantin',
@@ -364,7 +364,7 @@ window.KUA_TEMPLATES = [
     id: 'n7-penolakan-kehendak',
     nama: 'Formulir Penolakan Kehendak Nikah Rujuk (Model N7)',
     kategori: 'Lampiran Kep. Dirjen Bimas Islam',
-    deskripsi: 'Formulir N7 — pemberitahuan kekurangan syarat / penolakan kehendak nikah atau rujuk.',
+    deskripsi: 'Pemberitahuan kekurangan syarat atau penolakan kehendak nikah/rujuk.',
 
     // --- Tata letak formulir (Kepdirjen Bimas Islam 473/2020), bukan bentuk surat PMA ---
     formLayout: true,                                   // kop tengah tanpa logo & tanpa garis
@@ -402,8 +402,8 @@ window.KUA_TEMPLATES = [
         ' diberitahukan sebagai berikut:';
     },
 
-    // Dua blok pilihan berkotak centang (□). Daftar diambil dari field tipe 'list';
-    // hanya baris yang diisi yang ditampilkan (tanpa garis kosong).
+    // Dua blok pilihan. Daftar diambil dari field tipe 'list'; hanya baris yang diisi yang
+    // ditampilkan, blok tanpa isi disembunyikan, dan blok yang tampil otomatis bertanda ☑.
     checklist: [
       { heading: 'Pernikahan dapat dilaksanakan dengan melengkapi persyaratan :', listKey: 'syaratDapat' },
       { heading: 'Tidak dapat dilaksanakan (ditolak) karena tidak melengkapi persyaratan berupa :', listKey: 'syaratTolak' }
@@ -512,6 +512,7 @@ window.KUA_TEMPLATES = [
     placeholder: { nomor: 'contoh: B/160/KUA.01.23.05/PW.01/11/2026' },
     compact: true,
     hurufKecil: true,   // bukan naskah dinas KUA (yang berikrar adalah wali); 11 pt agar muat 1 halaman
+    kertasF4BilaTumpah: true, // isi tidak muat 1 halaman A4 -> kertas F4/Folio (huruf tidak dikecilkan)
 
     jenisNaskah: 'Surat Ikrar Taukil Wali',
 
@@ -564,10 +565,14 @@ window.KUA_TEMPLATES = [
 
     // Tanda tangan: [Mengetahui Kepala KUA | Wali + meterai], lalu [Saksi I | Saksi II].
     ttdHTML: function (d, h) {
+      // Mengikuti SURAT WAKILAH.docx: judul "SAKSI-SAKSI IKRAR:", lalu per saksi data diri dan
+      // label "Tanda Tangan Saksi I:" di atas ruang tanda tangan (tanpa label, nama di bawah
+      // terlihat seperti tanpa keterangan).
       function saksi(no, nama, nik, umur, alamat) {
         return '<div class="ttd-cell">' +
-          '<div class="saksi-judul">Saksi ' + no + ',</div>' +
+          '<div class="saksi-judul">Saksi ' + no + '</div>' +
           h.tabel([['Nama', nama], ['NIK', nik], ['Umur', umur ? umur + ' Tahun' : ''], ['Alamat', alamat]], 'saksi-data') +
+          '<div class="saksi-ttd">Tanda Tangan Saksi ' + no + ':</div>' +
           '<div class="space"></div>' +
           '<div class="nama">' + h.esc(nama) + '</div></div>';
       }
@@ -578,9 +583,12 @@ window.KUA_TEMPLATES = [
             '<div class="space meterai-slot"><span class="meterai">Meterai<br />Rp10.000</span></div>' +
             '<div class="nama">' + h.esc(d.namaWali) + '</div></div>' +
         '</div>' +
-        '<div class="ttd-grid saksi">' +
-          saksi('I', d.saksi1Nama, d.saksi1Nik, d.saksi1Umur, d.saksi1Alamat) +
-          saksi('II', d.saksi2Nama, d.saksi2Nik, d.saksi2Umur, d.saksi2Alamat) +
+        '<div class="saksi-blok">' +
+          '<div class="saksi-ikrar-judul">SAKSI-SAKSI IKRAR:</div>' +
+          '<div class="ttd-grid saksi">' +
+            saksi('I', d.saksi1Nama, d.saksi1Nik, d.saksi1Umur, d.saksi1Alamat) +
+            saksi('II', d.saksi2Nama, d.saksi2Nik, d.saksi2Umur, d.saksi2Alamat) +
+          '</div>' +
         '</div>';
     }
   },
