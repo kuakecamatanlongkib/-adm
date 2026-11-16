@@ -6,9 +6,9 @@ Dokumen ini merangkum apa yang sudah dikerjakan agar mudah dilanjutkan suatu saa
 Aplikasi web statis untuk membuat **surat pengantar KUA Kecamatan Longkib**.
 Berjalan **sepenuhnya di browser** (tanpa server), dipakai seimbang dari komputer dan HP.
 - **Layar lebar (≥ 1024px):** form di kiri, **pratinjau langsung** surat A4 di kanan yang
-  berubah setiap kali mengetik → tombol **Cetak / Simpan PDF** mencetak isi pratinjau.
+  berubah setiap kali mengetik → tombol **Cetak Surat** (atau **Ctrl+P**) mencetak isi pratinjau.
 - **HP / tablet layar sentuh:** form saja → tombol **Pratinjau Surat** membuka surat di tab
-  baru (lembar A4 utuh, cubit untuk zoom) → staf memeriksa → **Cetak / Simpan PDF**.
+  baru (lembar A4 utuh, cubit untuk zoom) → staf memeriksa → **Cetak Surat**.
 
 ## Tautan penting
 - **Situs live:** https://kuakecamatanlongkib.github.io/-adm/
@@ -96,6 +96,13 @@ Menambah surat baru = menambah **satu objek** di `KUA_TEMPLATES` (tidak menyentu
   Karena itu ruang tepi layar `.page.formulir` disamakan dengan `@page formulir` (18 mm atas/bawah).
 - **Cetak di layar lebar:** validasi → (bila kertas F4: dialog pengingat) → judul halaman induk
   diganti judul surat (nama file PDF) → `{kua:'print'}` → dikembalikan setelah `afterprint`.
+- **Tombol "Cetak Surat"** (dulu "Cetak / Simpan PDF"; garis miring terkesan dua tombol): sedikit
+  timbul + petunjuk `Ctrl P` (disembunyikan di layar sentuh). Simpan PDF dijelaskan di keterangan
+  bawah form, karena browser tidak mengizinkan aplikasi memilih "Save as PDF" sendiri.
+- **Ctrl+P / ⌘P** selalu mencetak SURAT lewat alur tombol (validasi, pengingat F4), bukan halaman
+  aplikasi: di halaman form (`app.js`), saat kursor di panel pratinjau (iframe kirim
+  `{kua:'pintasanCetak'}`), dan di tab surat HP (`cetakMandiri()`). Bila halaman form tetap dicetak
+  lewat menu browser, yang tercetak hanya petunjuk (`@media print` di `styles.css`).
 
 ### Pratinjau mengikuti kolom yang sedang diisi
 Saat staf masuk ke sebuah kolom (layar lebar), pratinjau **bergulir** ke bagian surat tempat
@@ -150,7 +157,8 @@ dipendekkan lagi, kertas kembali ke A4.
 - **Cetak di HP / layar sentuh** (`pointer: coarse`, termasuk iPad mendatar): selalu lewat tab
   baru, karena `print()` dari iframe di browser HP tidak konsisten. Halaman mandiri **tidak lagi
   membuka dialog cetak otomatis**; ada tombol **← Kembali** (menutup tab → kembali ke form yang
-  isiannya masih utuh) dan **Cetak / Simpan PDF**. Di layar sempit lembar A4 diperkecil utuh
+  isiannya masih utuh) dan **Cetak Surat**, dalam satu baris (Kembali kiri, Cetak kanan); info
+  "Lebih dari 1 halaman" dan "Kertas F4" tampil sebagai strip di bawahnya. Di layar sempit lembar A4 diperkecil utuh
   (bukan ditata ulang) + petunjuk "Cubit layar untuk memperbesar" pada layar sentuh.
 
 ## Tampilan form (UI)

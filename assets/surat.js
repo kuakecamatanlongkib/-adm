@@ -22,7 +22,8 @@
  *                 {kua:'zoom', mode}    -> 'halaman' (satu halaman utuh) | 'lebar'
  *                 {kua:'print', data}   -> gambar ulang, lalu cetak isi iframe
  *               Balasan ke halaman induk:
- *                 {kua:'ready'}, {kua:'info', title, lebih, kertas}, {kua:'afterprint'}
+ *                 {kua:'ready'}, {kua:'info', title, lebih, kertas}, {kua:'afterprint'},
+ *                 {kua:'pintasanCetak'} (Ctrl+P ditekan saat kursor di pratinjau)
  *               (kertas = 'A4' | 'F4'; induk menampilkan pemberitahuan & pengingat F4)
  *               Dipakai postMessage (bukan akses langsung ke iframe) agar tetap
  *               berjalan saat index.html dibuka dari file:// (dobel-klik).
@@ -550,6 +551,10 @@
 
   window.addEventListener('resize', fit);
 
+  function pintasanCetak(e) {   // Ctrl+P / ⌘P
+    return (e.ctrlKey || e.metaKey) && !e.altKey && !e.shiftKey && (e.key === 'p' || e.key === 'P');
+  }
+
   if (embed) {
     window.addEventListener('message', function (e) {
       if (e.source !== window.parent) return;
@@ -569,18 +574,28 @@
     window.addEventListener('afterprint', function () {
       window.parent.postMessage({ kua: 'afterprint' }, '*');
     });
+    // Ctrl+P saat kursor di panel pratinjau: serahkan ke halaman form (validasi, pengingat F4).
+    document.addEventListener('keydown', function (e) {
+      if (pintasanCetak(e)) { e.preventDefault(); window.parent.postMessage({ kua: 'pintasanCetak' }, '*'); }
+    });
     window.parent.postMessage({ kua: 'ready' }, '*');
   } else {
     // Mandiri: data dari URL. Dialog cetak TIDAK dibuka otomatis — staf memeriksa
-    // surat dulu (penting di HP), lalu menekan "Cetak / Simpan PDF".
+    // surat dulu (penting di HP), lalu menekan "Cetak Surat" (atau Ctrl+P).
     var data = {};
     new URLSearchParams(window.location.search).forEach(function (v, k) { data[k] = v; });
     render(data);
 
-    document.getElementById('btnCetak').addEventListener('click', function () {
+    function cetakMandiri() {
+      if (document.querySelector('dialog[open]')) return;
       // Kertas F4: ingatkan staf menyiapkan kertas F4 sebelum dialog cetak terbuka.
       if (kertas === 'F4') KUAUtil.konfirmasiF4(function () { window.print(); });
       else window.print();
+    }
+    document.getElementById('btnCetak').addEventListener('click', cetakMandiri);
+    // Ctrl+P di tab surat: alur yang sama dengan tombol (termasuk pengingat F4).
+    document.addEventListener('keydown', function (e) {
+      if (pintasanCetak(e)) { e.preventDefault(); cetakMandiri(); }
     });
     document.getElementById('btnKembali').addEventListener('click', function () {
       // Tab ini dibuka oleh form -> tutup agar kembali ke form (isian masih utuh).

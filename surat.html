@@ -8,13 +8,15 @@
 </head>
 <body>
   <!-- Toolbar (mode mandiri saja; disembunyikan saat tampil di panel pratinjau) -->
+  <!-- Satu baris: Kembali di kiri, Cetak di kanan. Info tampil sebagai strip di bawahnya. -->
   <div class="toolbar">
-    <button type="button" class="tb-back" id="btnKembali"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>Kembali</button>
-    <span class="tb-info" id="tbInfo">Lebih dari 1 halaman</span>
-    <span class="tb-kertas">Kertas F4 (Folio)</span>
-    <button type="button" class="tb-print" id="btnCetak"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v8H6z"/></svg>Cetak / Simpan PDF</button>
-    <div class="tb-kertas-ket">Isi surat tidak muat di A4, jadi kertas otomatis diganti ke F4 (215 × 330 mm). Siapkan kertas F4 saat mencetak.</div>
-    <div class="tb-hint">Cubit layar untuk memperbesar</div>
+    <div class="tb-baris">
+      <button type="button" class="tb-back" id="btnKembali"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>Kembali</button>
+      <button type="button" class="tb-print" id="btnCetak" aria-keyshortcuts="Control+P Meta+P"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v8H6z"/></svg>Cetak Surat</button>
+    </div>
+    <div class="tb-strip tb-lebih" id="tbInfo" role="status"><span class="pill">Lebih dari 1 halaman</span>Bagian di bawah garis merah tercetak di halaman 2.</div>
+    <div class="tb-strip tb-f4" role="status"><span class="pill">Kertas F4</span>Isi surat tidak muat di A4, jadi kertas otomatis diganti ke F4 (215 × 330 mm). Siapkan kertas F4 saat mencetak.</div>
+    <div class="tb-hint">Cubit layar untuk memperbesar. Untuk menyimpan PDF, pilih <strong>Save as PDF</strong> di dialog cetak.</div>
   </div>
 
   <!-- .sheet = wadah seukuran lembar setelah diperkecil; .page = lembar asli (A4, atau F4 bila otomatis diganti) -->

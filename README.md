@@ -10,9 +10,10 @@ Berjalan **sepenuhnya di browser** (tanpa server). Bisa dipakai dari komputer ma
 1. Buka `index.html` di browser (dobel-klik), atau buka URL-nya bila sudah di-hosting.
 2. Pilih **Jenis Surat**, lalu isi data.
 3. **Di komputer/laptop:** surat di sebelah kanan ikut berubah setiap kali mengetik.
-   Klik **Cetak / Simpan PDF**, lalu pilih **Save as PDF** pada dialog cetak.
+   Klik **Cetak Surat** (atau tekan **Ctrl+P**). Untuk menyimpan PDF, pilih **Save as PDF**
+   pada dialog cetak.
 4. **Di HP:** klik **Pratinjau Surat** → surat terbuka di tab baru (cubit layar untuk
-   memperbesar). Periksa, lalu tekan **Cetak / Simpan PDF**, atau **← Kembali** untuk mengubah data.
+   memperbesar). Periksa, lalu tekan **Cetak Surat**, atau **Kembali** untuk mengubah data.
 
 > **Kertas F4:** surat dicetak di kertas A4. Khusus **Surat Ikrar Taukil Wali**, bila isinya
 > terlalu panjang untuk 1 halaman A4, kertas otomatis diganti ke **F4 / Folio (215 × 330 mm)**.

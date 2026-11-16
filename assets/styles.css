@@ -243,7 +243,18 @@ select.input option { color: var(--ink); }
 }
 .btn:active { transform: scale(0.97); }
 .btn svg { flex: 0 0 auto; width: 16px; height: 16px; }
-.btn-primary { flex: 1 1 auto; order: 1; background: var(--green); color: #fff; }
+/* Aksi utama: sedikit timbul (garis terang di atas + bayangan lembut) agar terasa bisa ditekan */
+.btn-primary {
+  flex: 1 1 auto; order: 1; background: var(--green); color: #fff;
+  box-shadow: 0 1px 2px rgba(0, 60, 35, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.16);
+}
+/* Petunjuk pintasan di dalam tombol (Ctrl P); disembunyikan di layar sentuh */
+.btn .kbd {
+  margin-left: 2px; padding: 1px 6px; border-radius: 5px;
+  font-size: var(--fs-cap); font-weight: 600; letter-spacing: 0.02em;
+  background: rgba(255, 255, 255, 0.16); color: rgba(255, 255, 255, 0.92);
+}
+@media (pointer: coarse) { .btn .kbd { display: none; } }
 .btn-ghost { flex: 0 0 auto; order: 0; background: transparent; color: var(--ink-2); font-weight: 500; }
 @media (min-width: 560px) {
   .actions { justify-content: flex-end; }
@@ -389,6 +400,18 @@ footer.note:empty { display: none; }
   .tpl-picker.open .tpl-menu, .dp-pop, .kua-dialog[open], #fields.muncul { animation-name: kua-muncul; }
   .btn:active, .kua-dialog-aksi button:active { transform: none; }
   .tpl-select-chevron { transition: none; }
+}
+
+/* ---------- Mencetak halaman form lewat menu browser ----------
+   Ctrl+P sudah dialihkan ke surat (app.js). Bila staf tetap mencetak halaman ini lewat menu
+   browser, yang tercetak hanya petunjuk, bukan tampilan aplikasi. */
+@media print {
+  .layout { display: none !important; }
+  body { background: #fff; }
+  body::before {
+    content: "Untuk mencetak surat, tutup dialog ini lalu tekan tombol \"Cetak Surat\".";
+    display: block; padding: 20mm; font: 14pt Arial, sans-serif; color: #000;
+  }
 }
 
 /* ---------- Layar lebar: form di kiri, pratinjau di kanan ---------- */
